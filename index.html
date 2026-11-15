@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fabian Schenk, Prompt Engineer</title>
+<meta name="description" content="Fabian Schenk, Prompt Engineer für Conversational AI. Sechs KI-Agenten im Produktivbetrieb, Kundenservice per E-Mail, Chat und Telefon.">
+<link rel="canonical" href="https://fabianschenk94.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fabianschenk94.github.io/">
+<meta property="og:title" content="Fabian Schenk, Prompt Engineer">
+<meta property="og:description" content="KI-Agenten, die im Betrieb laufen. Sechs KI-Agenten im Produktivbetrieb, Kundenservice per E-Mail, Chat und Telefon.">
+<meta property="og:image" content="https://fabianschenk94.github.io/img/vorschau.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0c0b0a">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Schriften liegen lokal im Ordner fonts/, es wird nichts von Google geladen. */
+@font-face { font-family: "Bricolage Grotesque"; src: url("fonts/bricolage-grotesque.woff2") format("woff2"); font-weight: 200 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "Geist"; src: url("fonts/geist.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/geist-mono.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+:root {
+  /* Eine Welt, ein Thema: fast schwarz, warm getönt, Clay als einziger Akzent. */
+  --bg: #0c0b0a;
+  --surface: #151311;
+  --line: #2c2823;
+  --text: #f4eee5;
+  --muted: #a89e90;
+  --clay: #db8c64;
+  --ink: #1c0f08;
+  --poster: #b54c27;
+  --font-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* Layout: schmale Mono-Beschriftung links, Inhalt rechts; Zeilen mit Haarlinien statt Karten.
+     Bewegung sitzt an wenigen Stellen (Start, Demos, Fußbereich), der Rest bleibt ruhig. */
+  --gutter: clamp(16px, 4vw, 44px);
+  --h1: clamp(2.6rem, 7.8vw, 7rem);
+  /* acht feste Schriftgrößen */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1.0625rem;
+  --fs-lg: clamp(1.1rem, 1.5vw, 1.3rem);
+  --fs-xl: clamp(1.35rem, 2.4vw, 1.9rem);
+  --fs-2xl: clamp(1.6rem, 3.4vw, 2.75rem);
+  --fs-3xl: clamp(2rem, 5vw, 4.25rem);
+  --fs-4xl: clamp(2.6rem, 8.4vw, 7.5rem);
+  color-scheme: dark;
+}
+@property --ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img, canvas { max-width: 100%; display: block; }
+a { color: inherit; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 500; text-wrap: balance; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--clay); outline-offset: 3px; border-radius: 2px; }
+
+.wrap { max-width: 1280px; margin-inline: auto; padding-inline: var(--gutter); }
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.mono.lc { text-transform: none; letter-spacing: 0.02em; font-size: var(--fs-sm); line-height: 1.5; }
+.clay { color: var(--clay); }
+
+/* Einblenden beim Scrollen (nur mit Skript, sonst bleibt alles sichtbar) */
+.js .bf { opacity: 0; filter: blur(10px); transform: translateY(12px); }
+.js .bf.in {
+  opacity: 1; filter: none; transform: none;
+  transition: opacity .8s ease-out, filter .8s ease-out, transform .8s cubic-bezier(.19, 1, .22, 1);
+  transition-delay: var(--d, 0s);
+}
+
+/* Kopfzeile */
+.nav {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; gap: 1.5rem; min-height: 60px; }
+.brand { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-base); letter-spacing: -0.01em; text-decoration: none; margin-right: auto; }
+.lang { display: flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; }
+.lang button {
+  font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em;
+  background: none; border: 0; color: var(--muted); padding: 0.3rem 0.7rem; border-radius: 999px; cursor: pointer;
+}
+.lang button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+
+/* Dock (Desktop) */
+.dock {
+  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 20;
+  display: flex; align-items: flex-end; gap: 2px; height: 78px; padding: 9px 8px;
+  border: 1px solid var(--line); border-radius: 20px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  transition: opacity .3s ease-out, transform .4s cubic-bezier(.19, 1, .22, 1);
+}
+.has-js .dock:not(.show) { opacity: 0; transform: translate(-50%, 24px); pointer-events: none; }
+.dock a { --s: 1; position: relative; flex: none; width: 74px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; text-decoration: none; color: var(--muted); transition: color .15s ease-out; }
+.dock .ic { display: grid; place-items: center; width: calc(38px * var(--s)); height: calc(38px * var(--s)); border-radius: 12px; border: 1px solid var(--line); background: var(--bg); }
+.dock.rest .ic { transition: width .25s ease-out, height .25s ease-out; }
+.dock .ic svg { width: 46%; height: 46%; }
+.dock .dl { font-size: var(--fs-xs); line-height: 1; white-space: nowrap; }
+.dock a:hover, .dock a.active { color: var(--text); }
+.dock a.active .ic { border-color: color-mix(in srgb, var(--clay) 70%, var(--line)); }
+
+/* Kreis-Menü (Handy) */
+.fab {
+  display: none; position: fixed; right: 16px; bottom: 16px; z-index: 31;
+  width: 54px; height: 54px; border-radius: 50%; border: 0; background: var(--clay); color: var(--ink); cursor: pointer;
+  place-items: center;
+}
+.fab svg { width: 22px; height: 22px; }
+.fab .x { display: none; }
+.fab[aria-expanded="true"] .x { display: block; }
+.fab[aria-expanded="true"] .m { display: none; }
+.ring {
+  position: fixed; inset: 0; z-index: 30; visibility: hidden; opacity: 0;
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: opacity .25s ease-out, visibility 0s linear .25s;
+}
+.ring.open { visibility: visible; opacity: 1; transition: opacity .25s ease-out; }
+.ring a {
+  position: absolute; left: 50%; top: 50%; width: 84px; margin: -42px 0 0 -42px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; text-align: center;
+  font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.06em; text-transform: uppercase;
+  transform: scale(.4); opacity: 0;
+  transition: transform .5s cubic-bezier(.19, 1, .22, 1), opacity .3s ease-out;
+}
+.ring.open a { transform: translate(var(--x, 0), var(--y, 0)) scale(1); opacity: 1; transition-delay: calc(var(--i) * 35ms); }
+.ring .ic { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; }
+.ring .ic svg { width: 22px; height: 22px; }
+
+/* Start */
+.hero { position: relative; overflow: hidden; padding-top: clamp(2.5rem, 6vw, 5rem); }
+.hero::before {
+  content: ""; position: absolute; right: -10%; top: 8%; width: 70%; height: 90%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--clay) 16%, transparent), transparent 72%);
+  pointer-events: none;
+}
+#grid {
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; pointer-events: none;
+  -webkit-mask-image: radial-gradient(120% 95% at 50% 35%, #000 35%, transparent 100%);
+  mask-image: radial-gradient(120% 95% at 50% 35%, #000 35%, transparent 100%);
+}
+.hero .wrap { position: relative; }
+.status { display: flex; align-items: flex-start; gap: 0.7rem; }
+.status .dot {
+  flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--clay); margin-top: 0.42em;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--clay) 22%, transparent);
+}
+.status .mono { color: var(--text); }
+h1 {
+  font-size: var(--h1);
+  line-height: 0.94;
+  text-wrap: normal;
+  letter-spacing: -0.045em;
+  margin: 0.9rem 0 clamp(1.5rem, 3vw, 2.4rem);
+  overflow-wrap: anywhere;
+}
+.hero-grid {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px;
+  margin-top: clamp(1.6rem, 3.5vw, 3rem); align-items: start;
+}
+.hero-main { grid-column: 1 / span 7; padding-bottom: clamp(1.5rem, 3vw, 2.5rem); position: relative; z-index: 1; }
+.roles { color: var(--clay); }
+.lead { font-size: var(--fs-lg); line-height: 1.45; max-width: 34em; }
+.lead + .lead { margin-top: 1em; color: var(--muted); }
+.cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2.25rem; }
+.btn {
+  position: relative; display: inline-flex; align-items: center; gap: 0.6em;
+  font-size: var(--fs-sm); font-weight: 500; text-decoration: none;
+  padding: 0.85rem 1.4rem; border-radius: 999px; border: 1px solid var(--line);
+  transition: border-color .15s ease-out, background-color .15s ease-out;
+}
+.btn:hover { border-color: var(--muted); }
+.btn .arr { transition: transform .15s ease-out; }
+.btn:hover .arr { transform: translateX(3px); }
+.btn-primary { background: var(--clay); border-color: var(--clay); color: var(--ink); }
+.btn-primary:hover { border-color: var(--clay); background: #e59b76; }
+.portrait { grid-column: 8 / span 5; margin: 0; }
+.portrait { position: relative; aspect-ratio: 5 / 6; }
+.p-plate {
+  position: absolute; inset: 17% 0 0 0; border: 1px solid var(--line); will-change: transform;
+  background:
+    radial-gradient(85% 65% at 50% 28%, color-mix(in srgb, var(--clay) 42%, transparent), transparent 72%),
+    linear-gradient(180deg, #1b1714, var(--bg));
+}
+.p-cut {
+  position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; max-width: none;
+  object-fit: cover; object-position: 50% 0%; will-change: transform;
+  -webkit-mask-image: linear-gradient(#000 80%, transparent 100%);
+  mask-image: linear-gradient(#000 80%, transparent 100%);
+}
+
+/* Der Unterschied */
+.compare { margin-top: clamp(2rem, 4vw, 3rem); display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.compare .side { padding: 1.6rem 0; }
+.compare .side + .side { border-left: 1px solid var(--line); padding-left: clamp(1.2rem, 3vw, 2.5rem); }
+.compare .side:first-child { padding-right: clamp(1.2rem, 3vw, 2.5rem); }
+.old { margin-top: 1.1rem; font-family: var(--font-mono); font-size: var(--fs-sm); line-height: 1.9; color: var(--muted); }
+.old span { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 70%, transparent); }
+.talk { margin-top: 1.1rem; display: grid; gap: 0.9rem; }
+.talk p { font-family: var(--font-display); font-size: var(--fs-xl); line-height: 1.25; letter-spacing: -0.015em; }
+.talk .who { display: block; margin-bottom: 0.2rem; }
+.talk .ai { display: flex; align-items: center; gap: 0.6rem; }
+.wave { display: inline-flex; align-items: center; gap: 3px; height: 14px; }
+.wave i { width: 2px; height: 100%; background: var(--clay); border-radius: 1px; transform-origin: center; animation: wave 1.1s ease-in-out infinite; }
+.wave i:nth-child(2) { animation-delay: -.9s; } .wave i:nth-child(3) { animation-delay: -.6s; }
+.wave i:nth-child(4) { animation-delay: -.3s; } .wave i:nth-child(5) { animation-delay: -.75s; }
+@keyframes wave { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+
+/* Zahlen */
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.facts li { padding: clamp(1.5rem, 3vw, 2.5rem) 1.5rem clamp(1.5rem, 3vw, 2.5rem) 0; }
+.facts li + li { border-left: 1px solid var(--line); padding-left: 1.5rem; }
+.facts b {
+  display: block; font-family: var(--font-display); font-weight: 500;
+  font-size: var(--fs-3xl); line-height: 1; letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.facts b small { font-family: var(--font-body); font-size: var(--fs-sm); font-weight: 400; letter-spacing: 0; color: var(--muted); }
+.kpi-src { padding-bottom: 1.4rem; margin-top: -0.6rem; color: var(--muted); font-size: var(--fs-sm); }
+.facts span { display: block; margin-top: 0.7rem; color: var(--muted); font-size: var(--fs-sm); max-width: 16em; }
+
+/* Abschnitte */
+.section { position: relative; border-top: 1px solid var(--line); padding-block: clamp(3.5rem, 7.5vw, 7rem); scroll-margin-top: 60px; }
+.section > .wrap { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; row-gap: 1.25rem; }
+.rail { grid-column: 1 / span 3; padding-top: 0.5rem; }
+.body { grid-column: 4 / span 9; min-width: 0; }
+h2 { font-size: var(--fs-3xl); line-height: 1.02; letter-spacing: -0.038em; max-width: 16em; }
+.sub { margin-top: 1.4rem; font-size: var(--fs-lg); color: var(--muted); max-width: 36em; }
+.rows { margin-top: clamp(2.5rem, 5vw, 4rem); }
+.row {
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 0.6rem 2rem;
+  padding-block: 1.6rem; border-top: 1px solid var(--line);
+}
+.row:last-child { border-bottom: 1px solid var(--line); }
+.row h3 { font-size: var(--fs-xl); line-height: 1.15; letter-spacing: -0.02em; }
+.row p { color: var(--muted); max-width: 38em; }
+.note { margin-top: 1.6rem; color: var(--muted); max-width: 40em; }
+.note strong { color: var(--text); font-weight: 500; }
+h3.minor { margin-top: clamp(2.2rem, 4vw, 3rem); font-size: var(--fs-xl); letter-spacing: -0.025em; line-height: 1.1; }
+h3.minor + .checks { margin-top: 1.2rem; }
+.tl-sum { margin-top: 0.9rem; max-width: 40em; }
+.faq-a a { color: inherit; font-weight: 500; text-underline-offset: 3px; }
+
+/* Projekte */
+.project { margin-top: clamp(2.5rem, 5vw, 4rem); border-top: 1px solid var(--line); padding-top: 1.6rem; }
+.project { scroll-margin-top: 80px; }
+.project-top { display: grid; grid-template-columns: minmax(0, 1fr) clamp(150px, 20%, 210px); gap: 2rem; align-items: start; }
+.pm, .thumb { margin: 0; overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+.pm { aspect-ratio: 3 / 4; }
+.pm img, .thumb img, .lum-img { width: 100%; height: 100%; object-fit: cover; }
+.row.has-img { grid-template-columns: 120px minmax(0, 4fr) minmax(0, 7fr); scroll-margin-top: 80px; }
+.thumb { aspect-ratio: 2 / 3; }
+.fcard { scroll-margin-top: 80px; }
+.project-head { display: flex; flex-direction: column; gap: 0.5rem; }
+.project-head h3 { font-size: var(--fs-xl); letter-spacing: -0.025em; line-height: 1.1; }
+.steps3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 1.8rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.steps3 > div { padding: 1.5rem 1.5rem 1.7rem 0; }
+.steps3 > div + div { border-left: 1px solid var(--line); padding-left: 1.5rem; }
+.steps3 p { margin-top: 0.8rem; color: var(--muted); }
+.steps3 .after p { color: var(--text); }
+.steps3 .after .mono { color: var(--clay); }
+.quote {
+  margin: 1.8rem 0 0; font-family: var(--font-display); font-weight: 500;
+  font-size: var(--fs-2xl); line-height: 1.1; letter-spacing: -0.03em; max-width: 18em;
+}
+.quote + .mono { display: block; margin-top: 0.9rem; }
+.project .text { margin-top: 1.4rem; color: var(--muted); max-width: 42em; }
+.project .text + .text { margin-top: 0.9rem; }
+.project .text strong { color: var(--text); font-weight: 500; }
+
+/* Demos als gefaltete Karten */
+.cards { margin-top: clamp(2.5rem, 5vw, 4rem); display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.fcard { position: relative; display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--line); background: var(--surface); }
+.fcard::before {
+  content: ""; position: absolute; top: -1px; right: -1px; width: 46px; height: 46px; z-index: 2;
+  background: linear-gradient(225deg, var(--bg) 50%, #2f2a25 50%);
+  box-shadow: -1px 1px 0 var(--line);
+}
+.beam {
+  position: absolute; inset: -1px; pointer-events: none; padding: 1px;
+  background: conic-gradient(from var(--ang), transparent 0deg, transparent 290deg, var(--clay) 338deg, #fff4e6 354deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: beam 7s linear infinite;
+}
+.fcard:nth-child(2) .beam { animation-delay: -3.5s; }
+@keyframes beam { to { --ang: 360deg; } }
+.preview { aspect-ratio: 16 / 10; overflow: hidden; border-bottom: 1px solid var(--line); background: var(--bg); }
+.preview img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; }
+.fbody { display: flex; flex-direction: column; gap: 1rem; padding: clamp(1.4rem, 3vw, 2rem); flex: 1; }
+.fbody h3 { font-size: var(--fs-3xl); letter-spacing: -0.04em; line-height: 1; }
+.fbody p { color: var(--muted); max-width: 34em; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chips li { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 0.25rem 0.65rem; }
+.links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.6rem; margin-top: auto; padding-top: 0.8rem; }
+.link { text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--line); padding-bottom: 2px; transition: border-color .15s ease-out, color .15s ease-out; }
+.link:hover { border-color: var(--clay); color: var(--clay); }
+.demo-wide { margin-top: 20px; border: 1px solid var(--line); padding: clamp(1.4rem, 3vw, 2rem); display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1rem 2rem; align-items: start; }
+.demo-wide h3 { margin-top: 0.8rem; font-size: var(--fs-xl); letter-spacing: -0.025em; line-height: 1.1; }
+.demo-wide p { color: var(--muted); max-width: 34em; }
+
+/* Stichpunkte und Kenntnisse */
+.hl { margin-top: 1rem; display: grid; gap: 0.45rem; }
+.hl li { position: relative; padding-left: 1.2rem; color: var(--muted); font-size: var(--fs-sm); line-height: 1.45; }
+.hl li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 8px; height: 1px; background: var(--clay); }
+.hl2 { margin-top: 1.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; }
+.hl2 li { padding: 1.15rem 0; border-top: 1px solid var(--line); }
+.hl2 strong { display: block; font-family: var(--font-display); font-weight: 500; font-size: var(--fs-lg); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 0.35rem; }
+.hl2 span { color: var(--muted); font-size: var(--fs-sm); }
+.row .chips, .row .link { margin-top: 0.9rem; }
+.row .link { display: inline-block; }
+.row .mono { display: block; margin-bottom: 0.5rem; }
+.kgrid { margin-top: 1.6rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.kcell { padding: 1.5rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.kcell h3 { font-size: var(--fs-lg); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 1rem; }
+.langs { margin-top: 1.4rem; display: flex; flex-wrap: wrap; gap: 0.4rem 2rem; color: var(--muted); }
+.langs strong { color: var(--text); font-weight: 500; }
+
+/* Regeln */
+.rules { margin-top: clamp(2.5rem, 5vw, 4rem); }
+.rule { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 0.5rem 1rem; padding-block: 1.8rem; border-top: 1px solid var(--line); }
+.rule:last-child { border-bottom: 1px solid var(--line); }
+.rule h3 { font-size: var(--fs-2xl); letter-spacing: -0.035em; line-height: 1.05; }
+.rule p { grid-column: 2; color: var(--muted); max-width: 40em; }
+.rule .mono { padding-top: 0.55rem; }
+
+/* Listen */
+.checks { margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; }
+.checks li { padding: 1.1rem 0 1.1rem 1.6rem; border-top: 1px solid var(--line); position: relative; }
+.checks li::before { content: ""; position: absolute; left: 0; top: 1.75rem; width: 8px; height: 1px; background: var(--clay); }
+.checks li strong { font-weight: 500; }
+.checks li span { color: var(--muted); }
+
+/* Skills */
+.core { margin-top: clamp(2rem, 4vw, 3rem); }
+.core .chips { margin-top: 0.9rem; gap: 0.5rem; }
+.chips.big li { font-size: var(--fs-sm); color: var(--text); padding: 0.45rem 0.95rem; border-color: color-mix(in srgb, var(--clay) 55%, var(--line)); }
+
+/* Vorgehen: Liste mit Vorschau */
+.lumina { margin-top: clamp(2.5rem, 5vw, 4rem); display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 2rem; align-items: start; }
+.lumina li { border-top: 1px solid var(--line); }
+.lumina li:last-child { border-bottom: 1px solid var(--line); }
+.lum-item {
+  width: 100%; display: flex; align-items: baseline; gap: 1.2rem; text-align: left; cursor: pointer;
+  background: none; border: 0; padding: 1.15rem 0; color: var(--muted); transition: color .2s ease-out, padding .3s cubic-bezier(.19, 1, .22, 1);
+}
+.lum-item .t { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-xl); letter-spacing: -0.03em; line-height: 1.1; }
+.lum-item .mono { transition: color .2s ease-out; }
+.lumina li.active .lum-item { color: var(--text); padding-left: 0.6rem; }
+.lumina li.active .lum-item .mono { color: var(--clay); }
+.lum-text { display: none; color: var(--muted); padding: 0 0 1.2rem 0; }
+.lum-preview {
+  position: sticky; top: 84px; aspect-ratio: 4 / 5; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 0.6rem;
+  border: 1px solid var(--line); background: linear-gradient(160deg, var(--surface), var(--bg)); padding: clamp(1.4rem, 3vw, 2rem);
+}
+.lum-img { position: absolute; inset: 0; max-width: none; }
+.lum-shade { position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 35%, transparent) 0%, transparent 35%, color-mix(in srgb, var(--bg) 92%, transparent) 78%, var(--bg) 100%); }
+.lum-num {
+  position: absolute; top: -0.12em; right: 0.08em; font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(9rem, 17vw, 15rem); line-height: 1; letter-spacing: -0.06em;
+  color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--clay) 75%, transparent);
+}
+.lum-preview h3 { position: relative; font-size: var(--fs-xl); letter-spacing: -0.025em; line-height: 1.1; }
+.lum-preview p { position: relative; color: var(--muted); max-width: 26em; }
+.lum-preview.swap > *:not(.lum-shade) { animation: lum .5s cubic-bezier(.19, 1, .22, 1) backwards; }
+.lum-preview.swap h3 { animation-delay: .05s; } .lum-preview.swap p { animation-delay: .1s; }
+@keyframes lum { from { opacity: 0; filter: blur(8px); transform: translateY(10px); } }
+
+/* Weg */
+.story { margin-top: 1.4rem; display: grid; gap: 1em; max-width: 40em; color: var(--muted); font-size: var(--fs-lg); }
+.story p:first-child { color: var(--text); }
+.timeline { position: relative; margin-top: clamp(2.5rem, 5vw, 4rem); padding-left: 2.2rem; }
+.timeline::before { content: ""; position: absolute; left: 5px; top: 0.6rem; bottom: 1.6rem; width: 1px; background: var(--line); }
+.timeline .progress { position: absolute; left: 5px; top: 0.6rem; width: 1px; height: calc((100% - 2.2rem) * var(--p, 0)); background: var(--clay); }
+.tl-phase { padding-bottom: 0.9rem; }
+.tl, .tl-mark { position: relative; }
+.tl::before, .tl-mark::before {
+  content: ""; position: absolute; left: calc(-2.2rem + 1px); top: 1.5rem; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--bg); border: 1px solid var(--muted); transition: background-color .3s ease-out, border-color .3s ease-out, box-shadow .3s ease-out;
+}
+.tl.reached::before, .tl-mark.reached::before { background: var(--clay); border-color: var(--clay); }
+.tl { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 0.3rem 1.5rem; padding-block: 1.1rem; border-top: 1px solid var(--line); }
+.tl .when { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 0.2rem; }
+.tl strong { font-weight: 500; }
+.tl .where { color: var(--muted); }
+.tl .chips { margin-top: 0.7rem; }
+.tl-mark { display: flex; align-items: center; gap: 1rem; margin-top: 0.4rem; padding: 2.2rem 0 1.1rem; border-top: 1px solid var(--line); }
+.tl-mark::before { top: 2.35rem; left: calc(-2.2rem - 1px); width: 13px; height: 13px; }
+.tl-mark.reached::before { box-shadow: 0 0 0 5px color-mix(in srgb, var(--clay) 25%, transparent); }
+.tl-mark .mono { color: var(--clay); font-size: var(--fs-sm); }
+.tl-mark::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, color-mix(in srgb, var(--clay) 70%, transparent), transparent); }
+.tl.ai {
+  display: block; margin-top: 14px; padding: clamp(1.3rem, 2.6vw, 2rem); border: 1px solid var(--line);
+  border-top-color: color-mix(in srgb, var(--clay) 55%, var(--line));
+  background: linear-gradient(160deg, #1a1714, var(--bg) 85%);
+}
+.tl.ai::before { top: 1.9rem; width: 11px; height: 11px; left: -2.2rem; border-color: var(--clay); }
+.tl.ai.reached::before { box-shadow: 0 0 0 5px color-mix(in srgb, var(--clay) 22%, transparent); }
+.tl.ai.now.reached::before { animation: pulse 2.2s ease-out infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--clay) 55%, transparent); } 100% { box-shadow: 0 0 0 12px transparent; } }
+.tl.ai .when { color: var(--clay); padding: 0; }
+.tl.ai h3 { margin-top: 0.5rem; font-size: var(--fs-xl); letter-spacing: -0.03em; line-height: 1.1; }
+.tl.ai .where { display: block; margin-top: 0.35rem; }
+.tl.ai .chips { margin-top: 1.2rem; }
+.after-list { margin-top: 1.6rem; display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; align-items: baseline; }
+
+/* Warp-Karussell */
+.warp { margin-top: clamp(1.5rem, 3vw, 2.5rem); }
+#warp { width: 100%; max-width: none; height: clamp(320px, 38vw, 540px); cursor: grab; touch-action: pan-y; outline-offset: -4px; }
+#warp:active { cursor: grabbing; }
+.wheel-fallback { display: none; gap: 14px; overflow-x: auto; padding: 0 var(--gutter) 0.5rem; scroll-snap-type: x mandatory; }
+.wheel-fallback a { flex: none; width: 200px; aspect-ratio: 2 / 3; overflow: hidden; border: 1px solid var(--line); scroll-snap-align: center; }
+.wheel-fallback img { width: 100%; height: 100%; object-fit: cover; }
+.wheel-fallback .cap { display: none; }
+.no-gl #warp { display: none; }
+.no-gl .wheel-fallback { display: flex; }
+.wheel-bar { margin-top: 1.2rem; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem 2rem; align-items: end; border-top: 1px solid var(--line); padding-top: 1.3rem; }
+.wheel-info h3 { margin-top: 0.5rem; font-size: var(--fs-xl); letter-spacing: -0.03em; line-height: 1.1; }
+.wheel-info p { margin-top: 0.3rem; color: var(--muted); }
+.wheel-info .link { display: inline-block; margin-top: 0.9rem; }
+.wheel-nav { display: flex; gap: 0.5rem; }
+.wheel-nav button { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: none; cursor: pointer; font-size: var(--fs-base); transition: border-color .15s ease-out; }
+.wheel-nav button:hover { border-color: var(--muted); }
+.no-gl .wheel-nav { display: none; }
+
+/* Parallax-Band */
+.pband { position: relative; height: clamp(380px, 56vw, 700px); overflow: hidden; border-top: 1px solid var(--line); }
+.pband-img { position: absolute; left: 0; right: 0; top: -16%; height: 132%; }
+.pband-img img { width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 40%; will-change: transform; }
+.pband-shade { position: absolute; inset: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--bg) 82%, transparent) 0%, color-mix(in srgb, var(--bg) 35%, transparent) 45%, transparent 75%), linear-gradient(0deg, color-mix(in srgb, var(--bg) 75%, transparent), transparent 45%); }
+.pband .wrap { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: clamp(2rem, 5vw, 4rem); }
+.pband-text { will-change: transform; }
+.pband-text .mono { color: var(--text); }
+.pband-text p { margin-top: 0.8rem; font-family: var(--font-display); font-weight: 500; font-size: var(--fs-3xl); line-height: 1.02; letter-spacing: -0.04em; max-width: 11em; text-wrap: balance; }
+
+/* Kurz gefragt: Schlitz und Tintenflut */
+.slit { position: relative; display: inline-block; max-width: none; }
+.slit span { display: block; transition: transform .45s cubic-bezier(.19, 1, .22, 1); }
+.slit .top { clip-path: inset(-10% -5% 50% -5%); }
+.slit .bot { position: absolute; inset: 0; clip-path: inset(50% -5% -20% -5%); }
+.slit:hover .top { transform: translateY(-0.07em); }
+.slit:hover .bot { transform: translateY(0.07em); }
+.faq { margin-top: clamp(2.5rem, 5vw, 4rem); }
+.faq-item { position: relative; overflow: hidden; border-top: 1px solid var(--line); transition: color .35s ease-out; }
+.faq-item:last-child { border-bottom: 1px solid var(--line); }
+.faq-item::before {
+  content: ""; position: absolute; inset: 0; background: var(--text);
+  transform: scaleX(0); transform-origin: left; transition: transform .55s cubic-bezier(.19, 1, .22, 1);
+}
+.faq-item.open { color: var(--bg); }
+.faq-item.open::before { transform: scaleX(1); }
+.faq-q {
+  position: relative; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  text-align: left; background: none; border: 0; cursor: pointer; padding: 1.3rem clamp(0.9rem, 2vw, 1.4rem);
+  font-family: var(--font-display); font-weight: 500; font-size: var(--fs-xl); letter-spacing: -0.025em; line-height: 1.15;
+}
+.faq-q i { flex: none; position: relative; width: 16px; height: 16px; transition: transform .35s cubic-bezier(.19, 1, .22, 1); }
+.faq-q i::before, .faq-q i::after { content: ""; position: absolute; left: 0; top: 7.5px; width: 16px; height: 1.5px; background: currentColor; }
+.faq-q i::after { transform: rotate(90deg); }
+.faq-item.open .faq-q i { transform: rotate(45deg); }
+.faq-a { position: relative; display: grid; grid-template-rows: 1fr; transition: grid-template-rows .45s cubic-bezier(.19, 1, .22, 1); }
+.has-js .faq-item:not(.open) .faq-a { grid-template-rows: 0fr; }
+.faq-a > div { overflow: hidden; }
+.faq-a p { padding: 0 clamp(0.9rem, 2vw, 1.4rem) 1.5rem; max-width: 44em; }
+.faq-item.open :focus-visible { outline-color: var(--bg); }
+
+/* Ziel */
+.goal { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-3xl); line-height: 1.02; letter-spacing: -0.04em; max-width: 14em; text-wrap: balance; }
+
+/* Kontakt mit weichem Farbfeld */
+.contact { overflow: hidden; }
+.bloom { position: absolute; inset: 0; pointer-events: none; }
+.bloom i { position: absolute; border-radius: 50%; filter: blur(80px); }
+.bloom i:nth-child(1) { width: 46%; aspect-ratio: 1; left: 48%; top: -10%; background: var(--clay); opacity: .22; animation: drift1 22s ease-in-out infinite alternate; }
+.bloom i:nth-child(2) { width: 34%; aspect-ratio: 1; left: 22%; top: 45%; background: #8a4a2c; opacity: .3; animation: drift2 28s ease-in-out infinite alternate; }
+.bloom i:nth-child(3) { width: 22%; aspect-ratio: 1; left: 76%; top: 52%; background: #f1c7a8; opacity: .14; animation: drift3 19s ease-in-out infinite alternate; }
+@keyframes drift1 { to { transform: translate(-14%, 18%) scale(1.15); } }
+@keyframes drift2 { to { transform: translate(22%, -16%) scale(.9); } }
+@keyframes drift3 { to { transform: translate(-30%, -22%) scale(1.3); } }
+.contact h2 { font-size: var(--fs-4xl); line-height: 0.95; letter-spacing: -0.045em; max-width: none; }
+.btn-shine { margin-top: 2.2rem; border-color: transparent; background: color-mix(in srgb, var(--surface) 70%, transparent); font-size: var(--fs-base); padding: 1.05rem 1.7rem; }
+.btn-shine::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: radial-gradient(circle, transparent 28%, var(--clay) 44%, #fff4e6 50%, var(--clay) 56%, transparent 72%) 0% 0% / 300% 300%, var(--line);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: shine 9s linear infinite;
+}
+@keyframes shine { 50% { background-position: 100% 100%, 0 0; } }
+.contact-list { margin-top: clamp(2.5rem, 5vw, 4rem); }
+.contact-list li { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 0.3rem 1.5rem; padding-block: 1.15rem; border-top: 1px solid var(--line); align-items: baseline; }
+.contact-list li:last-child { border-bottom: 1px solid var(--line); }
+.contact-list a, .contact-list .plain { font-family: var(--font-display); font-size: var(--fs-xl); letter-spacing: -0.02em; }
+.contact-list a { text-decoration: none; overflow-wrap: anywhere; transition: color .15s ease-out; }
+.contact-list a:hover { color: var(--clay); }
+
+/* Fußbereich nach dem Vorbild "Wild Hunt": Gemälde hinten, Pixelkante, freigestellte Tannen vorn */
+.foot { position: relative; overflow: hidden; background: var(--poster); color: var(--text); }
+.wh-top { position: relative; height: clamp(320px, 36vw, 560px); }
+.foot-img { position: absolute; left: 0; top: -6%; width: 100%; height: 96%; max-width: none; object-fit: cover; object-position: 50% 0%; will-change: transform; }
+#scene { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; image-rendering: pixelated; }
+.wh-cut { position: absolute; left: -1%; bottom: -1px; width: 102%; max-width: none; height: auto; }
+.wh-deco { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; color: var(--text); opacity: .7; }
+.wh-body { position: relative; padding-top: 0; padding-bottom: 7rem; }
+.wh-grid { display: flex; justify-content: space-between; width: min(100%, 880px); margin: 0 auto; padding: 0.5rem 0 0.35rem; font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 500; letter-spacing: 0.08em; }
+.wh-grid span { border-left: 1px solid currentColor; padding-left: 4px; line-height: 1; }
+.wh-mark { position: relative; width: min(100%, 880px); margin: 0 auto; }
+#wordmark { width: 100%; max-width: none; image-rendering: pixelated; }
+.wh-flourish { position: absolute; left: -11%; top: -30%; width: 122%; height: 160%; overflow: visible; pointer-events: none; }
+.wh-flourish path { fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.wh-flourish.on path { stroke-dashoffset: 0; transition: stroke-dashoffset 2.6s cubic-bezier(.45, 0, .2, 1) .5s; }
+.foot .mono { color: var(--text); }
+.foot-cols { margin-top: clamp(2rem, 4vw, 3.2rem); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: 1.5rem 2rem; align-items: start; }
+.foot-cols ul { margin-top: 0.6rem; display: grid; gap: 0.2rem; }
+.foot-cols a, .foot-cols li, .top-link { text-decoration: none; font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.1em; text-transform: uppercase; }
+.foot-cols a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.top-link { white-space: nowrap; }
+.colophon { margin-top: 2rem; padding-top: 1rem; border-top: 1px dotted color-mix(in srgb, var(--text) 60%, transparent); display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; justify-content: space-between; align-items: center; font-size: var(--fs-xs); letter-spacing: 0.04em; }
+.colophon .c { display: inline-flex; align-items: center; gap: 0.6rem; }
+.colophon svg { width: 14px; height: 14px; }
+.edge { position: absolute; bottom: 9.5rem; writing-mode: vertical-rl; }
+.foot .edge.lc { font-size: var(--fs-xs); line-height: 1.6; }
+.edge.l { left: 2.4%; transform: rotate(180deg); } .edge.r { right: 2.4%; }
+.wh-cursor { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .2s ease-out; }
+.wh-cursor.on { opacity: 1; }
+.wh-cursor .h, .wh-cursor .v { position: absolute; left: 0; top: 0; }
+.wh-cursor .h { width: 100%; border-top: 1px dotted color-mix(in srgb, var(--text) 65%, transparent); }
+.wh-cursor .v { height: 100%; border-left: 1px dotted color-mix(in srgb, var(--text) 65%, transparent); }
+.wh-cursor .ring { position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--text); }
+.wh-cursor .lab { position: absolute; left: 12px; top: -16px; font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 500; letter-spacing: 0.08em; white-space: nowrap; color: var(--text); }
+.wh-grain { position: absolute; inset: 0; pointer-events: none; opacity: .22; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.foot :focus-visible { outline-color: var(--text); }
+
+/* Einstieg beim Laden: Ruhezustand bleibt sichtbar */
+@keyframes rise { from { opacity: 0; filter: blur(12px); transform: translateY(14px); } }
+.hero .status, .hero .roles, .hero h1, .hero .lead, .hero .cta, .portrait { animation: rise .9s cubic-bezier(.19, 1, .22, 1) backwards; }
+.hero h1 { animation-delay: .08s; } .hero .lead { animation-delay: .18s; } .hero .cta { animation-delay: .26s; } .portrait { animation-delay: .3s; }
+
+@media (max-width: 1340px) { .edge { display: none; } }
+@media (max-width: 980px) {
+  .rail, .body { grid-column: 1 / -1; }
+  .hero-main { grid-column: 1 / span 8; }
+  .portrait { grid-column: 9 / span 4; }
+  .kgrid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 720px) {
+  .dock { display: none; }
+  .fab { display: grid; }
+  .hero-grid { display: flex; flex-direction: column; align-items: stretch; gap: 2rem; }
+  .hero-main { padding-bottom: 0; }
+  .portrait { width: min(100%, 280px); margin-top: 0; }
+  .compare, .steps3, .cards, .checks, .lumina, .row, .hl2, .kgrid, .project-top { grid-template-columns: 1fr; }
+  .row.has-img { grid-template-columns: 1fr; }
+  .thumb { width: 120px; }
+  .pm { aspect-ratio: 16 / 10; order: -1; }
+  .wheel-bar { grid-template-columns: 1fr; }
+  .compare .side + .side { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; }
+  .compare .side:first-child { padding-right: 0; }
+  .facts { grid-template-columns: 1fr 1fr; }
+  .facts li, .facts li + li { padding: 1.4rem 1rem 1.4rem 0; border-left: 0; border-top: 1px solid var(--line); }
+  .facts li:nth-child(-n+2) { border-top: 0; }
+  .steps3 > div, .steps3 > div + div { padding: 1.3rem 0; border-left: 0; }
+  .steps3 > div + div { border-top: 1px solid var(--line); }
+  .rule { grid-template-columns: 1fr; }
+  .rule p { grid-column: 1; }
+  .rule .mono { padding-top: 0; }
+  .tl, .contact-list li { grid-template-columns: 1fr; }
+  .lum-preview { display: none; }
+  .lum-text { display: block; }
+  .lum-item { padding-bottom: 0.5rem; color: var(--text); }
+  .lumina li.active .lum-item { padding-left: 0; }
+  .foot-cols { grid-template-columns: 1fr 1fr; }
+  .wh-cut { width: 170%; left: -35%; }
+  .wh-deco, .wh-cursor { display: none; }
+  .wh-flourish { left: -4%; width: 108%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-start" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-do" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-5 4v-4H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></symbol>
+    <symbol id="i-proj" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v11H4zM9 8V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M4 13h16"/></symbol>
+    <symbol id="i-demo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5l11 7-11 7z"/></symbol>
+    <symbol id="i-skill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h4m4 0h8M4 12h10m4 0h2M4 17h2m4 0h10"/><circle cx="10" cy="7" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+    <symbol id="i-path" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-6a4 4 0 0 1 4-4h8M15 3l3 3-3 3"/><circle cx="6" cy="19" r="2"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></symbol>
+  </defs>
+</svg>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#start">Fabian Schenk</a>
+    <div class="lang" role="group" aria-label="Sprache / Language">
+      <button type="button" id="lang-de" aria-pressed="true">DE</button>
+      <button type="button" id="lang-en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<nav class="dock rest" aria-label="Abschnitte">
+  <a href="#start"><span class="ic"><svg><use href="#i-start"/></svg></span><span class="dl" data-i18n="u.d0">Start</span></a>
+  <a href="#leistung"><span class="ic"><svg><use href="#i-do"/></svg></span><span class="dl" data-i18n="u.d1">Leistung</span></a>
+  <a href="#projekte"><span class="ic"><svg><use href="#i-proj"/></svg></span><span class="dl" data-i18n="u.d2">Erfahrung</span></a>
+  <a href="#demos"><span class="ic"><svg><use href="#i-demo"/></svg></span><span class="dl" data-i18n="u.d3">Demos</span></a>
+  <a href="#skills"><span class="ic"><svg><use href="#i-skill"/></svg></span><span class="dl" data-i18n="u.d4">Kenntnisse</span></a>
+  <a href="#weg"><span class="ic"><svg><use href="#i-path"/></svg></span><span class="dl" data-i18n="u.d5">Werdegang</span></a>
+  <a href="#kontakt"><span class="ic"><svg><use href="#i-mail"/></svg></span><span class="dl" data-i18n="u.d6">Kontakt</span></a>
+</nav>
+
+<button class="fab" type="button" id="fab" aria-expanded="false" aria-controls="ring" aria-label="Menü">
+  <svg class="m" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  <svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+</button>
+<nav class="ring" id="ring" aria-label="Abschnitte">
+  <a href="#start" style="--i:0"><span class="ic"><svg><use href="#i-start"/></svg></span><span data-i18n="nav.0">Start</span></a>
+  <a href="#leistung" style="--i:1"><span class="ic"><svg><use href="#i-do"/></svg></span><span data-i18n="nav.1">Was ich mache</span></a>
+  <a href="#projekte" style="--i:2"><span class="ic"><svg><use href="#i-proj"/></svg></span><span data-i18n="x.nav2">Berufserfahrung</span></a>
+  <a href="#demos" style="--i:3"><span class="ic"><svg><use href="#i-demo"/></svg></span><span data-i18n="nav.3">Demos</span></a>
+  <a href="#skills" style="--i:4"><span class="ic"><svg><use href="#i-skill"/></svg></span><span data-i18n="x.nav4">Kenntnisse</span></a>
+  <a href="#weg" style="--i:5"><span class="ic"><svg><use href="#i-path"/></svg></span><span data-i18n="x.nav6">Werdegang</span></a>
+  <a href="#kontakt" style="--i:6"><span class="ic"><svg><use href="#i-mail"/></svg></span><span data-i18n="nav.5">Kontakt</span></a>
+</nav>
+
+<main>
+
+<section class="hero" id="start">
+  <canvas id="grid" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="status">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="mono lc" data-i18n="status">Offen für eine Festanstellung · remote · ab sofort</span>
+    </div>
+    <div class="hero-grid">
+      <div class="hero-main">
+        <p class="mono roles lc" data-i18n="x.roles">Prompt Engineering · Conversational AI</p>
+        <h1 data-i18n="x.h1">KI-Agenten,<br>die im <span class="clay">Betrieb</span><br>laufen.</h1>
+        <p class="lead" data-i18n="x.lead1">Ich bin Fabian Schenk. Ich bringe KI-Agenten für E-Mail, Chat und Telefon in den Betrieb. Und ich zeige Teams, wie sie damit arbeiten.</p>
+        <p class="lead" data-i18n="x.lead2">Den Kundenservice kenne ich aus über acht Jahren eigener Praxis.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#demos"><span data-i18n="cta.1">Demos ausprobieren</span> <span class="arr" aria-hidden="true">↓</span></a>
+          <a class="btn" href="https://linkedin.com/in/fabianschenk-ai"><span data-i18n="cta.2">Auf LinkedIn schreiben</span> <span class="arr" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+      <figure class="portrait" id="pfig">
+        <span class="p-plate" aria-hidden="true"></span>
+        <img id="portrait" class="p-cut" src="img/portrait-cut.webp" width="880" height="1100" alt="Porträt von Fabian Schenk">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section aria-label="Kennzahlen" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <ul class="facts">
+      <li><b>6</b><span data-i18n="x.f1">KI-Agenten in den Produktivbetrieb gebracht</span></li>
+      <li><b data-i18n="x.n2">15 %</b><span data-i18n="x.f2">aller Kundenmails vollautomatisiert beantwortet</span></li>
+      <li><b data-i18n="x.n3">25 %</b><span data-i18n="x.f3">kürzere Wartezeit am Telefon</span></li>
+      <li><b><small data-i18n="u.n4">rund</small> 20</b><span data-i18n="x.f4">Mitarbeitende im Umgang mit KI geschult</span></li>
+    </ul>
+    <p class="kpi-src" data-i18n="u.src">Erreicht im Customer Care Center des Europa-Park Hotel Resort (2023–2025) und bei Mailytica (2025–2026).</p>
+  </div>
+</section>
+
+<section class="section" id="leistung">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="s1.rail">Was ich mache</span></div>
+    <div class="body">
+      <h2 data-i18n="s1.h">Ich baue KI-Agenten, die Kundenanfragen beantworten.</h2>
+      <p class="sub" data-i18n="s1.sub">Per E-Mail, im Chat und am Telefon. Und ich zeige Teams, wie sie KI im Alltag selbst nutzen.</p>
+      <div class="rows">
+        <div class="row">
+          <h3 data-i18n="s1.a.h">Anfragen automatisieren</h3>
+          <p data-i18n="s1.a.p">Die KI liest eine E-Mail, erkennt alle Anliegen darin und schreibt daraus eine fertige, einheitliche Antwort. Der Mitarbeiter prüft nur noch und sendet ab.</p>
+        </div>
+        <div class="row">
+          <h3 data-i18n="s1.b.h">Sprach- und Chat-Agenten bauen</h3>
+          <p data-i18n="s1.b.p">Agenten, die zuhören, verstehen und Aufgaben erledigen: Auskunft geben, Zimmer oder Tische buchen, Fälle aufnehmen. Ohne Menü und ohne „Drücken Sie die 1“.</p>
+        </div>
+        <div class="row">
+          <h3 data-i18n="s1.c.h">Menschen mitnehmen</h3>
+          <p data-i18n="s1.c.p">Ich erkläre Mitarbeitenden, wie ChatGPT, Claude und ähnliche Werkzeuge funktionieren, damit sie sie selbst sinnvoll einsetzen können.</p>
+        </div>
+      </div>
+      <p class="note" data-i18n="s1.note">Der Fachbegriff dafür ist Conversational AI, meine Berufsbezeichnung Prompt Engineer.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="ueberblick">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="y.w.rail">Überblick</span></div>
+    <div class="body">
+      <h2 data-i18n="y.w.h">Sieben Projekte auf einen Blick.</h2>
+    </div>
+  </div>
+  <div class="warp" id="wheel">
+    <canvas id="warp" tabindex="0" role="group" aria-label="Projektauswahl. Pfeiltasten drehen das Karussell, die Eingabetaste öffnet das Projekt."></canvas>
+    <div class="wheel-fallback">
+      <a class="wheel-item" href="#p-ep"><img src="img/cover-customer-care.webp" alt="" width="640" height="960" loading="lazy"><span class="cap"><b data-i18n="y.w1.t">Customer Care Center</b><i data-i18n="y.w1.m">Europa-Park Hotel Resort · KI-Einführung · 2023–2025</i></span></a>
+      <a class="wheel-item" href="#p-mailytica"><img src="img/cover-belege.webp" alt="" width="640" height="960" loading="lazy"><span class="cap"><b data-i18n="y.w2.t">Zwei KI-Agenten für Rechnungen und Belege</b><i data-i18n="y.w2.m">Mailytica GmbH · Azure OpenAI · 2025–2026</i></span></a>
+      <a class="wheel-item" href="#d-ferdinand"><img src="img/wheel-ferdinand-anruf.webp" alt="" width="640" height="960" loading="lazy"><span class="cap"><b>Ferdinand</b><i data-i18n="y.w3.m">KI-Concierge · Voice und Chat · Demo</i></span></a>
+      <a class="wheel-item" href="#d-adrian"><img src="img/wheel-adrian.webp" alt="" width="640" height="960" loading="lazy"><span class="cap"><b>Adrian</b><i data-i18n="y.w4.m">KI-Support-Agent · Voice und Chat · Demo</i></span></a>
+      <a class="wheel-item" href="#o-pipeline"><img src="img/cover-content-pipeline.webp" alt="" width="640" height="960" loading="lazy"><span class="cap"><b data-i18n="x.o1.h">Agentische Content-Pipeline</b><i data-i18n="y.w5.m">Eigenprojekt · Claude Code und Python</i></span></a>
+      <a class="wheel-item" href="#o-beleg"><img src="img/cover-beleg-assistent.webp" alt="" width="640" height="960" loading="lazy"><span class="cap"><b data-i18n="d3.h">Beleg-Assistent</b><i data-i18n="y.w6.m">Langdock · OCR und strukturierte Daten</i></span></a>
+      <a class="wheel-item" href="#o-gpts"><img src="img/cover-custom-gpts.webp" alt="" width="640" height="960" loading="lazy"><span class="cap"><b data-i18n="x.o3.h">Eigene Custom GPTs</b><i data-i18n="y.w7.m">Privat · über 10 GPTs mit Wissensbasis</i></span></a>
+    </div>
+    <div class="wrap">
+      <div class="wheel-bar">
+        <div class="wheel-info" aria-live="polite">
+          <span class="mono wheel-count">01 / 07</span>
+          <h3 class="wheel-title">Customer Care Center</h3>
+          <p class="wheel-meta">Europa-Park Hotel Resort · KI-Einführung · 2023–2025</p>
+          <a class="link wheel-link" href="#p-ep"><span data-i18n="y.w.go">Zum Projekt</span> →</a>
+        </div>
+        <div class="wheel-nav">
+          <button type="button" class="wheel-prev" aria-label="Vorheriges Projekt">←</button>
+          <button type="button" class="wheel-next" aria-label="Nächstes Projekt">→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="projekte">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="x.s2.rail">Berufserfahrung</span></div>
+    <div class="body">
+      <h2 data-i18n="s2.h">Meine Arbeit läuft im echten Betrieb.</h2>
+      <p class="sub" data-i18n="s2.sub">Sie ist schriftlich bestätigt und lässt sich in eigenen Demos ausprobieren.</p>
+
+      <article class="project" id="p-ep">
+        <div class="project-top">
+          <div class="project-head">
+            <h3 data-i18n="p1.h">Europa-Park Hotel Resort, Customer Care Center</h3>
+            <span class="mono lc" data-i18n="x.p1.meta">System Specialist · 10/2023–09/2025 · KI-Einführung, Plattformadministration &amp; Conversational AI</span>
+          </div>
+          <figure class="pm"><img src="img/cover-customer-care.webp" alt="" width="640" height="960" loading="lazy"></figure>
+        </div>
+        <div class="steps3">
+          <div>
+            <span class="mono" data-i18n="p1.a.l">Vorher</span>
+            <p data-i18n="p1.a.p">Das Team arbeitete mit Textbausteinen, zuerst aus einer Word-Datei, später aus Mailytica. Die KI erkannte ein Anliegen pro E-Mail und schlug einen Baustein vor. Bei Mails mit mehreren Anliegen musste man Bausteine aneinanderhängen, umschreiben oder selbst ergänzen.</p>
+          </div>
+          <div>
+            <span class="mono" data-i18n="p1.b.l">Umsetzung</span>
+            <p data-i18n="p1.b.p">Gemeinsam mit dem CEO von Mailytica habe ich einen der ersten GPT-Agenten bei Mailytica eingeführt. Er erkennt alle Anliegen einer E-Mail und baut aus den passenden Bausteinen eine einzige, einheitliche Antwort.</p>
+          </div>
+          <div class="after">
+            <span class="mono" data-i18n="p1.c.l">Nachher</span>
+            <p data-i18n="p1.c.p">Das Umschreiben und Ergänzen fällt weg. Das Team arbeitet Anfragen schneller ab, und der Gast bekommt früher seine Antwort.</p>
+          </div>
+        </div>
+        <ul class="hl2">
+          <li data-i18n="x.e1"><strong>15 % aller Kundenmails vollautomatisiert</strong><span>Mailytica in Hotelreservierung und Gästeservice eingeführt. Die KI erkennt das Anliegen einer E-Mail (Intent-Klassifizierung). Ich habe sie mit Beispielen trainiert und laufend verbessert.</span></li>
+          <li data-i18n="x.e2"><strong>Vier KI-Agenten in den Live-Betrieb gebracht</strong><span>Passende wiederkehrende Anfragen ausgewählt, Prompts strukturiert entwickelt und die Qualität laufend gemessen. Nach dem Start habe ich die Agenten eng begleitet (Hypercare).</span></li>
+          <li data-i18n="x.e3"><strong>25 % kürzere Wartezeit am Telefon</strong><span>Anrufverteilung und Warteschleifen in Genesys Cloud neu gestaltet (IVR- und ACD-Routing). Ansagen mit Azure Text-to-Speech erstellt.</span></li>
+          <li data-i18n="x.e4"><strong>Voicebot in Genesys Cloud</strong><span>Konzipiert und umgesetzt. Er erkennt gesprochene Rechnungs- und Reservierungsnummern und ist bis heute im Live-Betrieb. Die Erkennung von Abteilung und Anliegen wurde getestet.</span></li>
+          <li data-i18n="x.e5"><strong>Plattform verwaltet und angebunden</strong><span>Genesys Cloud verwaltet (Mitarbeitende, Rollen, Berechtigungen). Hotelsystem und Mailytica sicher angebunden (OAuth), gemeinsam mit Dienstleistern wie Mailytica und der Telekom.</span></li>
+          <li data-i18n="x.e6"><strong>Rund 20 Mitarbeitende geschult</strong><span>Workshop zu Mailytica und den neuen ChatGPT-Funktionen, im Schichtbetrieb ergänzt durch Kurzeinweisungen und 1:1-Unterstützung per Bildschirmfreigabe.</span></li>
+          <li data-i18n="x.e7"><strong>Plattformen bewertet</strong><span>Parloa und Cognigy für das Contact Center geprüft, mit ersten Tests in einer Demo-Umgebung und einer Handlungsempfehlung an die Direktion.</span></li>
+        </ul>
+      </article>
+
+      <article class="project" id="p-mailytica">
+        <div class="project-top">
+          <div>
+        <div class="project-head">
+          <h3>Mailytica GmbH</h3>
+          <span class="mono lc" data-i18n="x.p2.meta">Prompt Engineer | AI Assistant Developer (LLM) · 10/2025–03/2026 · Festanstellung, remote</span>
+        </div>
+        <p class="quote" data-i18n="p2.quote">„Ich habe da einen Job, und ich weiß, du kannst so was.“</p>
+        <span class="mono lc" data-i18n="p2.quote.by">Lorenz Bernauer, CEO von Mailytica · nach der Einführung von ChatGPT in Mailytica im Europa-Park Hotel Resort</span>
+        <p class="text" data-i18n="x.p2.p1">Für einen führenden europäischen Flottendienstleister habe ich zwei mehrsprachige KI-Agenten in den Produktivbetrieb gebracht: einen für die automatisierte Rechnungsverarbeitung und einen für die Steuerung von Ansprüchen in der Behördenkommunikation.</p>
+          </div>
+          <figure class="pm"><img src="img/cover-belege.webp" alt="" width="640" height="960" loading="lazy"></figure>
+        </div>
+        <ul class="hl2">
+          <li data-i18n="x.m1"><strong>Prompt Engineering in Azure OpenAI</strong><span>Prompts direkt im Azure-OpenAI-Portal entwickelt, getestet und Schritt für Schritt verbessert.</span></li>
+          <li data-i18n="x.m2"><strong>Verlässliche, einheitliche Antworten</strong><span>Systematisch geprüft und abgesichert, mit Beispielen im Prompt (Few-Shot) und festen Vorgaben für die Ausgabe (Output-Constraints).</span></li>
+          <li data-i18n="x.m3"><strong>Belege als saubere Daten</strong><span>Beleg einlesen (OCR), mit GPT verstehen, strukturiert ausgeben. Die Ausgabe rückte Schritt für Schritt näher an den Goldstandard des Kunden.</span></li>
+          <li data-i18n="x.m4"><strong>Schriftlich bestätigt</strong><span>Arbeitszeugnis und Empfehlungsschreiben, jeweils auf Deutsch und Englisch, unterzeichnet von Lorenz Bernauer. Er steht auch für ein Referenzgespräch zur Verfügung. Den Kontakt stelle ich gern her.</span></li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="demos">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="x.s3.rail">Demos</span></div>
+    <div class="body">
+      <h2 data-i18n="x.s3.h">Eigene Agenten zum Ausprobieren.</h2>
+      <p class="sub" data-i18n="s3.sub">Ferdinand und Adrian sind online. Beide kann man anschreiben oder direkt auf der Website anrufen.</p>
+      <div class="cards">
+        <article class="fcard" id="d-ferdinand">
+          <span class="beam" aria-hidden="true"></span>
+          <div class="preview"><img src="img/ferdinand-anruf.webp" alt="Butler Ferdinand im dunklen Anzug am Telefon in der Hotel-Lounge" data-alt-en="Butler Ferdinand in a dark suit on the phone in the hotel lounge" width="1120" height="700" loading="lazy"></div>
+          <div class="fbody">
+            <span class="mono lc" data-i18n="x.d1.role">KI-Concierge · fiktives Hotel Tannenhof · 10/2026</span>
+            <h3>Ferdinand</h3>
+            <p data-i18n="x.d1.p">Voice- und Chat-Agent für ein Demo-Hotel: beantwortet Gästefragen in fünf Sprachen und bucht Zimmer und Tische live in ein Google-Sheet-Hotelsystem. Antwortet nur auf die gestellte Frage.</p>
+            <ul class="hl" data-i18n="x.d1.hl"><li>Gesprächsführung entworfen (Conversation Design): Persona, Normalfall, Rückfragen und Übergabe an einen Menschen</li><li>Vier Schnittstellen (Webhooks) und ein Backend in Google Apps Script, mit Eingabeprüfung, Buchungslimits und Duplikaterkennung</li><li>Schutzregeln (Guardrails), Datensparsamkeit und neun feste Testfälle, bis zur Abwehr von Manipulationsversuchen (Prompt Injection)</li></ul>
+            <ul class="chips"><li>ElevenLabs Agents</li><li>Google Apps Script</li><li>Google Sheets</li><li>GitHub Pages</li></ul>
+            <div class="links">
+              <a class="link" href="https://fabianschenk94.github.io/Hotel-Tannenhof-DEMO/"><span data-i18n="u.lf">Ferdinand live testen</span> →</a>
+              <a class="link" href="https://github.com/FabianSchenk94/Hotel-Tannenhof-DEMO"><span data-i18n="u.gf">Ferdinand auf GitHub</span> →</a>
+            </div>
+          </div>
+        </article>
+        <article class="fcard" id="d-adrian">
+          <span class="beam" aria-hidden="true"></span>
+          <div class="preview"><img src="img/adrian-platz.webp" alt="Support-Agent Adrian mit Headset an seinem Arbeitsplatz vor mehreren Bildschirmen" data-alt-en="Support agent Adrian with a headset at his desk in front of several screens" width="1120" height="700" loading="lazy"></div>
+          <div class="fbody">
+            <span class="mono lc" data-i18n="x.d2.role">KI-Support-Agent · fiktive Softwarefirma StaffGrid · 10/2026</span>
+            <h3>Adrian</h3>
+            <p data-i18n="x.d2.p">Mehrsprachiger Voice- und Chat-Agent (EN/DE/FR) für den ersten Support-Kontakt: nimmt Fälle auf, priorisiert sie nach vier Stufen und legt sie direkt in Jira Service Management an. Den Status nennt er per Fallnummer.</p>
+            <ul class="hl" data-i18n="x.d2.hl"><li>Eigene Schnittstelle zum Ticketsystem (REST, Cloudflare Worker), mit Schlüsselprüfung, Anfragelimits und klaren Fehlercodes</li><li>Persona und Gesprächsabläufe dokumentiert, inklusive Übergabe an einen Menschen</li><li>Sieben Fehlerquellen behoben, durch systematische Auswertung der Gesprächsprotokolle aus Testanrufen</li></ul>
+            <ul class="chips"><li>ElevenLabs Agents</li><li>Cloudflare Workers</li><li>Jira Service Management</li></ul>
+            <div class="links">
+              <a class="link" href="https://fabianschenk94.github.io/StaffGrid-Support-DEMO/"><span data-i18n="u.la">Adrian live testen</span> →</a>
+              <a class="link" href="https://github.com/FabianSchenk94/StaffGrid-Support-DEMO"><span data-i18n="u.ga">Adrian auf GitHub</span> →</a>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="rows">
+        <div class="row has-img" id="o-pipeline">
+          <figure class="thumb"><img src="img/cover-content-pipeline.webp" alt="" width="640" height="960" loading="lazy"></figure>
+          <div><span class="mono lc" data-i18n="x.o1.m">Eigenprojekt · seit 09/2026</span><h3 data-i18n="x.o1.h">Agentische Content-Pipeline</h3></div>
+          <div>
+            <p data-i18n="x.o1.p">Pipeline auf Basis eines Open-Source-Repositorys in Betrieb genommen und mit Claude Code erweitert. Fünf API-Dienste angebunden und vor dem Einsatz mit 107 bestandenen automatischen Tests (Unit-Tests) geprüft. Jede Veröffentlichung läuft über eine manuelle Freigabe (Human-in-the-Loop).</p>
+            <ul class="chips"><li>Claude Code</li><li>VS Code</li><li>Python</li><li>OpenAI API</li><li>REST-APIs</li></ul>
+          </div>
+        </div>
+        <div class="row has-img" id="o-beleg">
+          <figure class="thumb"><img src="img/cover-beleg-assistent.webp" alt="" width="640" height="960" loading="lazy"></figure>
+          <div><span class="mono lc" data-i18n="d3.role">Läuft in Langdock · nicht öffentlich</span><h3 data-i18n="d3.h">Beleg-Assistent</h3></div>
+          <div>
+            <p data-i18n="d3.p">Liest Rechnungen und Belege, gibt strukturierte Daten zurück, schlägt eine Kostenstelle vor und markiert Unsicheres mit „Bitte manuell prüfen“.</p>
+            <ul class="chips"><li>Langdock</li><li>OCR</li><li>JSON</li></ul>
+          </div>
+        </div>
+        <div class="row has-img" id="o-gpts">
+          <figure class="thumb"><img src="img/cover-custom-gpts.webp" alt="" width="640" height="960" loading="lazy"></figure>
+          <div><span class="mono lc" data-i18n="x.o3.m">Privat · laufend</span><h3 data-i18n="x.o3.h">Eigene Custom GPTs</h3></div>
+          <div>
+            <p data-i18n="x.o3.p">Über 10 Custom GPTs mit Wissensdatenbanken (RAG) für konkrete Alltagsaufgaben, darunter ein E-Mail-Assistent, ein Text- und Anschreiben-Prüfer und ein KI-News-Assistent.</p>
+            <ul class="chips"><li>ChatGPT Custom GPTs</li><li>RAG</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="profil">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="s4.rail">Was mich unterscheidet</span></div>
+    <div class="body">
+      <h2 data-i18n="x.s4.h">Ich kenne den Kundenservice von innen.</h2>
+      <p class="sub" data-i18n="x.s4.sub">Über acht Jahre habe ich selbst an Rezeption und Telefon gearbeitet, Schichten geleitet und neue Teammitglieder eingearbeitet. Deshalb baue ich Agenten aus Sicht des Gastes. Daraus folgen drei Regeln, nach denen ich arbeite.</p>
+      <div class="rules">
+        <div class="rule">
+          <span class="mono" data-i18n="r1.n">Regel 1</span>
+          <h3 data-i18n="r1.h">Eine Frage, eine Antwort.</h3>
+          <p data-i18n="r1.p">Ein Gast will nicht alles hören, was man noch wissen könnte. Mein digitaler Butler Ferdinand beantwortet genau die Frage, die gestellt wurde, kurz und fachlich richtig.</p>
+        </div>
+        <div class="rule">
+          <span class="mono" data-i18n="r2.n">Regel 2</span>
+          <h3 data-i18n="r2.h">Niemand erzählt sein Anliegen zweimal.</h3>
+          <p data-i18n="r2.p">Wer schon in der Warteschleife war, möchte sein Anliegen nicht wiederholen. Der Agent nimmt die Vorarbeit ab und gibt die Infos direkt an den Mitarbeiter weiter, der sofort weitermachen kann.</p>
+        </div>
+        <div class="rule">
+          <span class="mono" data-i18n="r3.n">Regel 3</span>
+          <h3 data-i18n="r3.h">Ich spreche die Sprache des Teams.</h3>
+          <p data-i18n="r3.p">Ich war selbst Anwender. Ich erkläre KI so, dass auch Kolleginnen und Kollegen mitkommen, die mit Technik sonst wenig zu tun haben.</p>
+        </div>
+      </div>
+      <h3 class="minor" data-i18n="u.aw">So arbeite ich im Team</h3>
+      <ul class="checks">
+        <li><strong data-i18n="a1.h">Ich übernehme Verantwortung.</strong> <span data-i18n="a1.p">Ob Beschwerde an der Rezeption oder technisches Problem: Ich nehme es an und löse es.</span></li>
+        <li><strong data-i18n="a2.h">Ich erkläre verständlich.</strong> <span data-i18n="a2.p">Auch Kolleginnen und Kollegen ohne Technikbezug kommen mit.</span></li>
+        <li><strong data-i18n="a3.h">Ich arbeite ruhig und verlässlich im Team.</strong> <span data-i18n="a3.p">Mit offenem Ohr und klaren Absprachen.</span></li>
+        <li><strong data-i18n="a4.h">Ich arbeite konzentriert und termintreu.</strong> <span data-i18n="a4.p">Am liebsten an einem Projekt, im eigenen Tempo und pünktlich.</span></li>
+      </ul>
+      <p class="note" data-i18n="s4.note">Dazu kommt: Ich habe KI nicht zuerst im Kurs gelernt, sondern im laufenden Betrieb eingeführt und danach zertifizieren lassen.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="skills">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="x.s6.rail">Kenntnisse</span></div>
+    <div class="body">
+      <div class="skills-head">
+          <h2 data-i18n="x.s6.h">Vom Prompt bis zum Go-live.</h2>
+          <p class="sub" data-i18n="x.s6.sub">Ich bringe einen KI-Agenten von der ersten Idee bis in den täglichen Betrieb und sorge dafür, dass das Team damit arbeiten kann.</p>
+      </div>
+      <div class="core">
+        <span class="mono" data-i18n="u.core">Kernkompetenzen</span>
+        <ul class="chips big"><li>Prompt Engineering</li><li>Conversational AI</li><li>Voice AI</li><li>Conversation Design</li><li>Azure OpenAI</li><li>ElevenLabs Agents</li><li>Genesys Cloud</li><li>Mailytica</li><li>Testing &amp; Guardrails</li><li>Team-Enablement</li></ul>
+      </div>
+      <div class="kgrid">
+        <div class="kcell"><h3 data-i18n="x.k1">LLMs &amp; Agents</h3><ul class="chips" data-i18n="x.k1.c"><li>ChatGPT &amp; Custom GPTs</li><li>OpenAI API</li><li>Azure OpenAI</li><li>Claude</li><li>Perplexity</li><li>RAG / Wissensbasis</li><li>Tool Calling</li></ul></div>
+        <div class="kcell"><h3>Prompt Engineering</h3><ul class="chips"><li>System Prompts</li><li>Few-Shot</li><li>Chain-of-Thought</li><li>Output-Constraints</li><li>Prompt-Testing</li></ul></div>
+        <div class="kcell"><h3>Conversational &amp; Voice AI</h3><ul class="chips"><li>Conversation Design</li><li>Intents &amp; NLU</li><li>Dialog Flows</li><li>Personas</li><li>ElevenLabs Agents</li><li>Voicebots</li><li>Genesys Cloud (Administration, IVR/ACD)</li><li>Mailytica</li><li>Azure Text-to-Speech</li><li>Voiceflow</li></ul></div>
+        <div class="kcell"><h3 data-i18n="x.k4">Entwicklung &amp; Schnittstellen</h3><ul class="chips" data-i18n="x.k4.c"><li>Claude Code</li><li>VS Code</li><li>Python (KI-assistiert)</li><li>Google Apps Script</li><li>Google Sheets</li><li>Cloudflare Workers</li><li>GitHub &amp; GitHub Pages</li><li>Webhooks</li><li>REST-APIs</li><li>OAuth</li><li>Jira Service Management</li><li>Apify</li><li>Publora</li></ul></div>
+        <div class="kcell"><h3 data-i18n="x.k5">Vermittlung &amp; Enablement</h3><ul class="chips" data-i18n="x.k5.c"><li>Onboarding &amp; Schulung</li><li>Workshops</li><li>1:1-Coaching per Screen-Sharing</li><li>Team-Enablement</li><li>Standardisierte Abläufe</li><li>LinkedIn-Fachbeiträge</li><li>Projektdokumentation</li></ul></div>
+        <div class="kcell"><h3 data-i18n="x.k6">Qualität &amp; Compliance</h3><ul class="chips" data-i18n="x.k6.c"><li>Testing</li><li>Validierung</li><li>Unit-Tests</li><li>Agent-Testing</li><li>Guardrails</li><li>KPI-Monitoring</li><li>Go-live &amp; Hypercare</li><li>EU AI Act</li><li>DSGVO</li><li>Human-in-the-Loop</li></ul></div>
+      </div>
+      <p class="langs" data-i18n="x.langs"><span><strong>Deutsch</strong> · Muttersprache</span><span><strong>Englisch</strong> · verhandlungssicher</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="vorgehen">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="s7.rail">Vorgehen</span></div>
+    <div class="body">
+      <h2 data-i18n="s7.h">Erst zeigen, dann entscheiden.</h2>
+      <div class="lumina" id="lumina">
+        <ol>
+          <li class="active"><button type="button" class="lum-item"><span class="mono">01</span><span class="t" data-i18n="v1.h">Stand aufnehmen</span></button><p class="lum-text" data-i18n="v1.p">Was gibt es schon, wo hakt es, welche Bereiche sind betroffen?</p></li>
+          <li><button type="button" class="lum-item"><span class="mono">02</span><span class="t" data-i18n="v2.h">Schnelle Anwendungsfälle finden</span></button><p class="lum-text" data-i18n="v2.p">Was lässt sich sofort automatisieren? Wo reicht es, dem Team den Umgang mit KI beizubringen?</p></li>
+          <li><button type="button" class="lum-item"><span class="mono">03</span><span class="t" data-i18n="v3.h">Ideen aus dem Haus einsammeln</span></button><p class="lum-text" data-i18n="v3.p">Gibt es schon eigene Ideen, und wie einfach oder aufwendig sind sie?</p></li>
+          <li><button type="button" class="lum-item"><span class="mono">04</span><span class="t" data-i18n="v4.h">Demo zeigen</span></button><p class="lum-text" data-i18n="v4.p">Bevor entschieden wird, baue ich ein Beispiel zum Anfassen: „Schau, das wäre machbar.“</p></li>
+          <li><button type="button" class="lum-item"><span class="mono">05</span><span class="t" data-i18n="v5.h">Umsetzen</span></button><p class="lum-text" data-i18n="v5.p">Passende Werkzeuge auswählen, bauen, testen, verbessern.</p></li>
+          <li><button type="button" class="lum-item"><span class="mono">06</span><span class="t" data-i18n="v6.h">Team mitnehmen</span></button><p class="lum-text" data-i18n="v6.p">Einweisen und danach ansprechbar bleiben.</p></li>
+        </ol>
+        <div class="lum-preview" aria-live="polite">
+          <img class="lum-img" src="img/schritt-1.webp" alt="" width="640" height="960">
+          <span class="lum-shade" aria-hidden="true"></span>
+          <span class="lum-num" aria-hidden="true">01</span>
+          <h3>Stand aufnehmen</h3>
+          <p>Was gibt es schon, wo hakt es, welche Bereiche sind betroffen?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="weg">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="x.s8.rail">Werdegang</span></div>
+    <div class="body">
+      <h2 data-i18n="x.s8.h">Erst Kundenservice, seit 2023 KI im Betrieb.</h2>
+      <div class="story">
+        <p data-i18n="x.s8.p1">Gelernt habe ich Hotelfachmann. Über acht Jahre habe ich im Nachtdienst des Europa-Park Hotel Resort gearbeitet, Schichten geleitet und neue Teammitglieder eingearbeitet. Ich weiß aus eigener Erfahrung, was Gäste am Telefon und an der Rezeption brauchen.</p>
+        <p data-i18n="x.s8.p2">Mit ChatGPT habe ich sehr früh privat angefangen. 2023 wurde daraus mein Beruf: Als System Specialist im Customer Care Center des Europa-Park Hotel Resort habe ich KI in den laufenden Betrieb gebracht. Seitdem arbeite ich ausschließlich an KI-Projekten.</p>
+      </div>
+      <div class="timeline" id="timeline">
+        <span class="progress" aria-hidden="true"></span>
+        <p class="mono tl-phase lc" data-i18n="x.t.ph1">Hotellerie · Führung, Onboarding &amp; Schulung</p>
+        <ol>
+          <li class="tl"><span class="when">2011–2014</span><div><strong data-i18n="x.t1.a">Ausbildung zum Hotelfachmann</strong> <span class="where">· Landgasthof Hotel Frank, Hüfingen</span></div></li>
+          <li class="tl"><span class="when">09/2014–02/2015</span><div><strong data-i18n="x.t2.a">Serviceleitung</strong> <span class="where">· Landgasthof Hotel Frank, Hüfingen</span></div></li>
+          <li class="tl"><span class="when">03/2015–04/2023</span><div><strong data-i18n="x.t3.a">Night Audit, Schichtleiter im Nachtdienst, Stellv. Night Audit Manager</strong> <span class="where">· Europa-Park Hotel Resort</span>
+            <ul class="chips" data-i18n="x.t3.c"><li>Schichtleitung</li><li>Rezeption und Telefon</li><li>Einarbeitung neuer Teammitglieder</li><li>Onboarding- und Schulungsroutinen</li></ul></div></li>
+          <li class="tl"><span class="when">05/2023–09/2023</span><div><strong>Night Manager</strong> <span class="where">· Le Méridien, Stuttgart</span></div></li>
+          <li class="tl-mark"><span class="mono" data-i18n="x.t.mark">Ab hier KI · 2023</span></li>
+          <li class="tl ai">
+            <span class="when">10/2023–09/2025</span>
+            <h3 data-i18n="x.t5.a">System Specialist, Customer Care Center</h3>
+            <span class="where" data-i18n="x.t5.b">Europa-Park Hotel Resort, Rust · KI-Einführung, Plattformadministration &amp; Conversational AI</span>
+            <p class="tl-sum" data-i18n="u.t5">KI in den laufenden Betrieb gebracht: E-Mail-Automatisierung, vier KI-Agenten, Telefonie-Routing und Voicebot.</p>
+            <ul class="chips"><li>Mailytica</li><li>NLU &amp; Intents</li><li>Prompt Engineering</li><li>Genesys Cloud</li><li>IVR/ACD</li><li>OAuth</li><li>Azure Text-to-Speech</li></ul>
+          </li>
+          <li class="tl ai">
+            <span class="when">10/2025–03/2026</span>
+            <h3>Prompt Engineer | AI Assistant Developer (LLM)</h3>
+            <span class="where" data-i18n="x.t6.b">Mailytica GmbH, Konstanz · Festanstellung, remote</span>
+            <p class="tl-sum" data-i18n="u.t6">Zwei mehrsprachige KI-Agenten für Rechnungen und Belege in den Produktivbetrieb gebracht.</p>
+            <ul class="chips" data-i18n="x.t6.c"><li>Azure OpenAI</li><li>Prompt-Tuning</li><li>OCR</li><li>Strukturierte Ausgabe (JSON)</li></ul>
+          </li>
+          <li class="tl ai now">
+            <span class="when" data-i18n="x.t7.t">04/2026–heute</span>
+            <h3 data-i18n="x.t7.a">Familienzeit und KI-Weiterbildung</h3>
+            <span class="where" data-i18n="x.t7.b">Zertifizierung der seit 2023 angewandten Praxis, dazu eigene Projekte</span>
+            <p class="tl-sum" data-i18n="u.t7">Zwei Zertifikate bei Distart, dazu zwei eigene Voice- und Chat-Agenten und eine Content-Pipeline.</p>
+            <ul class="chips"><li>ElevenLabs Agents</li><li>Voiceflow</li><li>RAG</li><li>EU AI Act</li><li>DSGVO</li><li>Claude Code</li></ul>
+          </li>
+        </ol>
+      </div>
+      <div class="after-list">
+        <a class="link" href="https://linkedin.com/in/fabianschenk-ai"><span data-i18n="w.cv">Ausführlicher Lebenslauf auf LinkedIn</span> →</a>
+      </div>
+      <p class="note" data-i18n="x.cert"><strong>Zertifikate:</strong> Distart-Weiterbildung „Digitales Marketing, Management und KI“ (750 Unterrichtseinheiten, 04–07/2026) mit den Zertifikaten KI Prompt Engineer und Conversational AI. Sie belegen formal, was ich seit 2023 in der Praxis mache.</p>
+    </div>
+  </div>
+</section>
+
+<section class="pband" id="ort" aria-labelledby="ort-h">
+  <div class="pband-img" aria-hidden="true"><img id="pband-img" src="img/parallax.webp" alt="" width="1536" height="1024" loading="lazy"></div>
+  <div class="pband-shade" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="pband-text" id="pband-text">
+      <span class="mono" data-i18n="y.o.l">Arbeitsort</span>
+      <p id="ort-h" data-i18n="y.o.h">Remote aus Hüfingen im Schwarzwald.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="fragen">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="s12.rail">Kurz gefragt</span></div>
+    <div class="body">
+      <h2 class="slit"><span class="top" data-i18n="s12.h">Kurz gefragt.</span><span class="bot" aria-hidden="true" data-i18n="s12.h">Kurz gefragt.</span></h2>
+      <div class="faq">
+        <div class="faq-item open">
+          <button type="button" class="faq-q" aria-expanded="true"><span data-i18n="q1">Was suchen Sie?</span><i aria-hidden="true"></i></button>
+          <div class="faq-a"><div><p data-i18n="q1.a">Eine Festanstellung im Bereich Conversational AI. Ich arbeite remote aus Hüfingen im Schwarzwald und bin ab sofort verfügbar.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" aria-expanded="false"><span data-i18n="q2">Kann man Ihre Arbeit ausprobieren?</span><i aria-hidden="true"></i></button>
+          <div class="faq-a"><div><p data-i18n="q2.a">Ja. Ferdinand und Adrian sind online. Beide kann man anschreiben oder direkt auf der Website anrufen: <a href="https://fabianschenk94.github.io/Hotel-Tannenhof-DEMO/">Ferdinand testen</a> · <a href="https://fabianschenk94.github.io/StaffGrid-Support-DEMO/">Adrian testen</a></p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" aria-expanded="false"><span data-i18n="q3">Gibt es Belege für Ihre Arbeit?</span><i aria-hidden="true"></i></button>
+          <div class="faq-a"><div><p data-i18n="x.q3.a">Ja. Ein Arbeitszeugnis und ein Empfehlungsschreiben von Mailytica, jeweils auf Deutsch und Englisch. Lorenz Bernauer, CEO von Mailytica, steht außerdem für ein Referenzgespräch zur Verfügung. Den Kontakt stelle ich gern her. Dazu kommen die Zertifikate KI Prompt Engineer und Conversational AI.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" aria-expanded="false"><span data-i18n="q4">Wie führen Sie ein Team an KI heran?</span><i aria-hidden="true"></i></button>
+          <div class="faq-a"><div><p data-i18n="q4.a">Kurz einweisen, zum Beispiel rund zehn Minuten in der Schichtübergabe. Danach erkläre ich es einzeln am Bildschirm, bis es sitzt, und bleibe ansprechbar.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q" aria-expanded="false"><span data-i18n="q5">Sind Sie auf eine Branche festgelegt?</span><i aria-hidden="true"></i></button>
+          <div class="faq-a"><div><p data-i18n="q5.a">Nein. Hotel und Reservierung, Industrie oder klassischer Kundenservice: Wichtig ist, dass Kunden anrufen oder schreiben und schneller eine gute Antwort bekommen sollen.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="ziel">
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="s10.rail">Wohin ich will</span></div>
+    <div class="body">
+      <p class="goal" data-i18n="s10.h">Voice-Agenten, mit denen man gern spricht.</p>
+      <p class="sub" data-i18n="s10.p">Viele Hotlines arbeiten noch mit Computerstimmen und Menüs. Ich will sie durch Agenten ersetzen, die menschlich klingen und verstehen, was man braucht. Man sagt einfach, was man möchte.</p>
+      <div class="compare">
+    <div class="side">
+      <span class="mono" id="contrast-label" data-i18n="c.old.label">Heute an vielen Hotlines</span>
+      <p class="old">
+        <span data-i18n="c.old.1">„Für Reservierungen drücken Sie die 1.“</span><br>
+        <span data-i18n="c.old.2">„Für Fragen zu Ihrer Buchung drücken Sie die 2.“</span><br>
+        <span data-i18n="c.old.3">„Für alle anderen Anliegen drücken Sie die 3.“</span>
+      </p>
+    </div>
+    <div class="side">
+      <span class="mono clay" data-i18n="c.new.label">So soll es klingen</span>
+      <div class="talk">
+        <p><span class="mono who" data-i18n="c.guest">Gast</span><span data-i18n="c.new.1">„Ich möchte für Samstag einen Tisch für vier.“</span></p>
+        <p><span class="mono who ai"><span data-i18n="c.ai">KI-Agent</span> <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></span><span data-i18n="c.new.2">„Gern. Um wie viel Uhr möchten Sie kommen?“</span></p>
+      </div>
+    </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section contact" id="kontakt">
+  <div class="bloom" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="wrap">
+    <div class="rail"><span class="mono" data-i18n="s11.rail">Kontakt</span></div>
+    <div class="body">
+      <h2 data-i18n="s11.h">Schreiben Sie mir.</h2>
+      <p class="sub" data-i18n="s11.sub">Ich bin offen für eine Festanstellung im Bereich Conversational AI, arbeite remote und bin ab sofort verfügbar. Am schnellsten erreichen Sie mich über eine Nachricht auf LinkedIn.</p>
+      <a class="btn btn-shine" href="https://linkedin.com/in/fabianschenk-ai"><span data-i18n="cta.2">Auf LinkedIn schreiben</span> <span class="arr" aria-hidden="true">→</span></a>
+      <ul class="contact-list">
+        <li><span class="mono">LinkedIn</span><a href="https://linkedin.com/in/fabianschenk-ai">linkedin.com/in/fabianschenk-ai</a></li>
+        <li><span class="mono">GitHub</span><a href="https://github.com/FabianSchenk94">github.com/FabianSchenk94</a></li>
+        <li><span class="mono" data-i18n="k.home">Wohnort</span><span class="plain" data-i18n="k.home.v">Hüfingen, Baden-Württemberg</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot" id="fuss">
+  <div class="wh-top">
+    <img class="foot-img" id="foot-img" src="img/footer.webp" alt="" width="1536" height="1024" loading="lazy">
+    <canvas id="scene" aria-hidden="true"></canvas>
+    <img class="wh-cut" src="img/firs-cut.webp" alt="" width="1536" height="320" loading="lazy">
+  </div>
+  <svg class="wh-deco" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+    <circle cx="8%" cy="50%" r="16%" stroke-dasharray="0.5 7"/>
+    <circle cx="89%" cy="88%" r="11%" stroke-dasharray="0.5 7"/>
+    <line x1="2.4%" y1="62%" x2="27%" y2="62%" stroke-dasharray="0.5 5"/>
+    <line x1="73%" y1="84%" x2="97.6%" y2="84%" stroke-dasharray="0.5 5"/>
+    <rect x="2.2%" y="61.6%" width="4" height="4" fill="currentColor" stroke="none"/>
+    <rect x="97.4%" y="83.6%" width="4" height="4" fill="currentColor" stroke="none"/>
+  </svg>
+  <span class="mono edge l lc" aria-hidden="true" data-i18n="z.el">Ich kenne beide Seiten:<br>den Menschen, der anruft,<br>und die Technik, die ihm antwortet.</span>
+  <span class="mono edge r lc" aria-hidden="true" data-i18n="z.er">Prompt Engineer · Conversational AI<br>Hüfingen im Schwarzwald · remote</span>
+  <div class="wrap wh-body">
+    <div class="wh-grid" aria-hidden="true"><span>A1</span><span>B2</span><span>C3</span><span>D4</span><span>E5</span><span>F6</span></div>
+    <div class="wh-mark">
+      <canvas id="wordmark" role="img" aria-label="Fabian Schenk"></canvas>
+      <svg class="wh-flourish" id="flourish" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M 6 182 C 70 206, 150 196, 176 150 C 198 108, 150 84, 112 104 C 70 128, 96 182, 190 180 C 420 174, 560 60, 790 38 C 900 28, 968 62, 960 104 C 952 144, 890 150, 866 116 C 846 84, 880 44, 930 40 C 972 38, 996 62, 994 92"/></svg>
+    </div>
+    <div class="foot-cols">
+      <div>
+        <span class="mono" data-i18n="fo.c1">Seite</span>
+        <ul>
+          <li><a href="#leistung" data-i18n="nav.1">Was ich mache</a></li>
+          <li><a href="#projekte" data-i18n="x.nav2">Berufserfahrung</a></li>
+          <li><a href="#skills" data-i18n="x.nav4">Kenntnisse</a></li>
+          <li><a href="#weg" data-i18n="x.nav6">Werdegang</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="mono" data-i18n="z.c2">Projekte</span>
+        <ul>
+          <li><a href="#ueberblick" data-i18n="y.w.rail">Überblick</a></li>
+          <li><a href="https://fabianschenk94.github.io/Hotel-Tannenhof-DEMO/">Ferdinand</a></li>
+          <li><a href="https://fabianschenk94.github.io/StaffGrid-Support-DEMO/">Adrian</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="mono" data-i18n="z.c3">Profile</span>
+        <ul>
+          <li><a href="https://linkedin.com/in/fabianschenk-ai">LinkedIn</a></li>
+          <li><a href="https://github.com/FabianSchenk94">GitHub</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="mono">Status</span>
+        <ul>
+          <li data-i18n="z.s1">Offen für Festanstellung</li>
+          <li data-i18n="z.s2">Remote · ab sofort</li>
+        </ul>
+      </div>
+      <a class="top-link" href="#start">↑ <span data-i18n="fo.top">Nach oben</span></a>
+    </div>
+    <div class="colophon">
+      <span class="c">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M13 3l-1.5 1.5M4.5 11.5L3 13"/></svg>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M8 1l2 4 4 1-3 3 1 5-4-2-4 2 1-5-3-3 4-1z"/></svg>
+        <span>© 2026 Fabian Schenk</span>
+      </span>
+      <span data-i18n="z.colo">Der Schriftzug ist aus Blöcken gezeichnet, nicht gesetzt. Hotel Tannenhof und StaffGrid sind fiktive Demo-Projekte.</span>
+    </div>
+  </div>
+  <div class="wh-cursor" id="whcur" aria-hidden="true"><i class="h"></i><i class="v"></i><i class="ring"></i><span class="lab"></span></div>
+  <div class="wh-grain" aria-hidden="true"></div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  root.classList.add("has-js");
+  var RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hooks = [];
+  var lang = "de";
+  function safe(fn) { try { fn(); } catch (e) { if (window.console) console.error(e); } }
+  function $(s, p) { return (p || document).querySelector(s); }
+  function $$(s, p) { return Array.prototype.slice.call((p || document).querySelectorAll(s)); }
+  function inView(el, cb) {
+    if (!("IntersectionObserver" in window)) { cb(true); return; }
+    new IntersectionObserver(function (es) { es.forEach(function (e) { cb(e.isIntersecting); }); }, { rootMargin: "120px" }).observe(el);
+  }
+  var scrollFns = [], ticking = false;
+  function onScroll(fn) { scrollFns.push(fn); }
+  function runScroll() { ticking = false; scrollFns.forEach(function (f) { safe(f); }); }
+  function reqScroll() { if (!ticking) { ticking = true; requestAnimationFrame(runScroll); } }
+  window.addEventListener("scroll", reqScroll, { passive: true });
+  window.addEventListener("resize", reqScroll);
+
+  /* ---------- Sprache ---------- */
+  var en = {
+    "nav.0": "Start", "nav.1": "What I do", "nav.2": "Projects", "nav.3": "Demos", "nav.4": "Skills", "nav.5": "Contact", "nav.6": "My path",
+    "status": "Open to a permanent role · remote · available now",
+    "h1": 'The hotel pro who<br>builds <span class="clay">AI</span>.',
+    "lead.1": "I am Fabian Schenk from Hüfingen in the Black Forest. I come from the hotel business, and today I build AI assistants for customer service.",
+    "lead.2": "I know both sides: the person who calls, and the technology that answers.",
+    "cta.1": "Try the demos", "cta.2": "Message me on LinkedIn",
+    "c.old.label": "On many hotlines today",
+    "c.old.1": "“For reservations, press 1.”",
+    "c.old.2": "“For questions about your booking, press 2.”",
+    "c.old.3": "“For all other requests, press 3.”",
+    "c.new.label": "How it should sound",
+    "c.guest": "Guest", "c.ai": "AI agent",
+    "c.new.1": "“I’d like a table for four on Saturday.”",
+    "c.new.2": "“Of course. What time would you like to come?”",
+    "f.1": "years on night duty at the front desk and on the phone",
+    "f.2": "AI agents in production at the Customer Care Center",
+    "f.3": "multilingual agents for invoices and receipts",
+    "f.4": "teaching units of further training, with two certificates",
+    "s1.rail": "What I do",
+    "s1.h": "I build AI agents that answer customer requests.",
+    "s1.sub": "By email, in chat and on the phone. And I show teams how to use AI in their own daily work.",
+    "s1.a.h": "Automating requests",
+    "s1.a.p": "The AI reads an email, finds every request in it and writes one finished, consistent reply. The employee only checks it and sends it.",
+    "s1.b.h": "Building voice and chat agents",
+    "s1.b.p": "Agents that listen, understand and get things done: answer questions, book rooms or tables, open cases. No menu and no “press 1”.",
+    "s1.c.h": "Bringing people along",
+    "s1.c.p": "I explain to staff how ChatGPT, Claude and similar tools work, so they can use them well on their own.",
+    "s1.note": "The technical term for this is Conversational AI. My job title is Prompt Engineer.",
+    "s2.rail": "My proof",
+    "s2.h": "My work runs in real operations.",
+    "s2.sub": "It is confirmed in writing, and you can try it out in my own demos.",
+    "p1.h": "Europa-Park Hotel Resort, Customer Care Center",
+    "p1.meta": "System Specialist · 2023–2025",
+    "p1.a.l": "Before",
+    "p1.a.p": "The team worked with text modules, first from a Word file, later from Mailytica. The AI recognised one request per email and suggested one module. For emails with several requests, people had to string modules together, rewrite them or add the rest by hand.",
+    "p1.b.l": "My part",
+    "p1.b.p": "Together with the CEO of Mailytica, I introduced one of the first GPT agents at Mailytica. It recognises every request in an email and builds one single, consistent reply from the matching modules.",
+    "p1.c.l": "After",
+    "p1.c.p": "The rewriting and adding is gone. The team handles requests faster, and the guest gets an answer sooner.",
+    "p1.more": "On top of that: <strong>four AI agents in production</strong>, the <strong>redesign of the routing in Genesys Cloud</strong> and the <strong>onboarding of the whole team</strong>. About ten minutes at shift handover, then ongoing one-to-one calls with screen sharing.",
+    "p2.meta": "Prompt Engineer · 10/2025–03/2026",
+    "p2.quote": "“I have a job for you, and I know you can do this kind of thing.”",
+    "p2.quote.by": "Lorenz Bernauer, CEO of Mailytica · after the rollout of ChatGPT in Mailytica at the Europa-Park Hotel Resort",
+    "p2.p1": "For a leading European fleet services provider I built two multilingual AI agents that process invoices and receipts. The flow: read the document (OCR), understand it with GPT, return clean data. Day by day the output got better and moved closer to the customer’s gold standard. Built in Azure OpenAI.",
+    "p2.p2": "<strong>Proof:</strong> employment reference and letter of recommendation, each in German and English, signed by the managing director.",
+    "m.1": "“Is a double room still free this weekend?”", "m.2": "“One moment, I’ll check.”",
+    "m.3": "“I’d like a table for four on Saturday.”", "m.4": "“Of course. What time would you like to come?”",
+    "m.5": "“Our time tracking hasn’t loaded since this morning.”", "m.6": "“I’ll open a case for you.”",
+    "m.7": "“What is the status of my case?”", "m.8": "“Please give me your case number.”",
+    "s3.rail": "My own demos",
+    "s3.h": "Demos you can try.",
+    "s3.sub": "Ferdinand and Adrian are online. You can write to both of them or call them right on the website.",
+    "d.av": "G", "d.av2": "C",
+    "d1.q": "Is a double room still free this weekend?", "d1.a": "One moment, I’ll check.", "d1.in": "Message Ferdinand",
+    "d2.q": "Our time tracking hasn’t loaded since this morning.", "d2.a": "I’ll open a case. How many people are affected?", "d2.in": "Message Adrian",
+    "d1.role": "Digital butler · fictional Hotel Tannenhof",
+    "d1.p": "An assistant on the hotel website that writes, speaks and books: information, free rooms and prices, room and table reservations. It answers only the question that was asked.",
+    "d2.role": "Support agent · fictional software company StaffGrid",
+    "d2.p": "Customer support with no link to hotels: it opens cases, sets the priority, creates tickets in Jira and gives the status by case number. Website in English, French and German.",
+    "d.live": "Open live demo", "d.repo": "Project on GitHub",
+    "d3.role": "Runs in Langdock · not public",
+    "d3.h": "Receipt assistant",
+    "d3.p": "Reads invoices and receipts, returns structured data, suggests a cost centre and marks anything uncertain with “Please check manually”.",
+    "s4.rail": "What sets me apart",
+    "s4.h": "I build assistants from the guest’s point of view.",
+    "s4.sub": "I spent years on the phone and at the front desk myself before I built AI. Three rules I work by follow from that.",
+    "r1.n": "Rule 1", "r2.n": "Rule 2", "r3.n": "Rule 3",
+    "r1.h": "One question, one answer.",
+    "r1.p": "A guest does not want to hear everything else there is to know. My digital butler Ferdinand answers exactly the question that was asked, briefly and correctly.",
+    "r2.h": "Nobody explains their request twice.",
+    "r2.p": "Someone who has already waited on hold does not want to repeat their request. The agent does the groundwork and passes the details straight to the employee, who can carry on at once.",
+    "r3.h": "I speak the team’s language.",
+    "r3.p": "I was a user myself. I explain AI so that colleagues who have little to do with technology can follow too.",
+    "s4.note": "One more thing: I did not learn AI in a course first. I introduced it in live operations and got certified afterwards.",
+    "s5.rail": "Where I fit",
+    "s5.h": "Wherever customers wait too long for a good answer today.",
+    "s5.sub": "The industry does not matter to me: hotels and reservations, manufacturing or classic customer service. I am a particularly good fit if one of these is true.",
+    "s5.1": "The team answers the same questions every day and can hardly keep up.",
+    "s5.2": "The phone line still runs a computer voice with a menu.",
+    "s5.3": "People say “we want to use AI”, but there is no plan yet for where to start.",
+    "s5.4": "Staff should be able to use AI themselves and need someone who explains it clearly.",
+    "s6.rail": "What I can do",
+    "s6.h": "From the first idea into daily operations.",
+    "s6.sub": "I take an AI assistant all the way there and make sure the team can work with it.",
+    "t.h1": "Area", "t.h2": "What I can do", "t.h3": "What I have worked with",
+    "t1.a": "Prompts and agents", "t1.b": "Guide AI assistants so that they answer reliably, briefly and correctly",
+    "t2.a": "Email automation", "t2.b": "Recognise requests, build replies from text modules, test quality",
+    "t3.a": "Voice and chat assistants", "t3.b": "Build assistants that speak, write and book",
+    "t4.a": "Telephony and routing", "t4.b": "Route calls and requests to the right place",
+    "t5.a": "Reading documents", "t5.b": "Have invoices and receipts read and returned as clean data", "t5.c": "OCR, GPT, structured output (JSON)",
+    "t6.a": "Integration and automation", "t6.b": "Connect assistants to spreadsheets, ticket systems and websites",
+    "t7.a": "Team onboarding", "t7.b": "A short briefing, then one-to-one explanations on screen until it sticks", "t7.c": "Shift handovers, one-to-one calls",
+    "s7.rail": "Approach",
+    "s7.h": "Show first, then decide.",
+    "v1.h": "Take stock", "v1.p": "What is already there, where does it get stuck, which areas are affected?",
+    "v2.h": "Find quick use cases", "v2.p": "What can be automated right away? Where is it enough to teach the team how to use AI?",
+    "v3.h": "Collect ideas from the team", "v3.p": "Are there ideas already, and how simple or complex are they?",
+    "v4.h": "Show a demo", "v4.p": "Before anything is decided, I build an example people can try: “Look, this would be possible.”",
+    "v5.h": "Build", "v5.p": "Choose the right tools, build, test, improve.",
+    "v6.h": "Bring the team along", "v6.p": "Onboard people and stay available afterwards.",
+    "s8.rail": "My path",
+    "s8.h": "From the night shift to AI.",
+    "s8.p1": "For eight years I worked the night shift at the Europa-Park hotels, at the front desk and on the phone, most recently as deputy night manager. So I know from experience how a guest feels who has waited a long time and simply wants an answer.",
+    "s8.p2": "I started using ChatGPT privately very early on. In 2023 it became my job: at the Customer Care Center of the Europa-Park Hotel Resort I got to work on a technical project for the first time, instead of working with guests. It gripped me, and I have done nothing else since.",
+    "w1.t": "since 04/2026",
+    "w1.a": "Family time and AI training", "w1.b": "· Distart, own demo projects",
+    "w3.b": "· Customer Care Center at the Europa-Park Hotel Resort",
+    "w5.a": "Night shift at the Europa-Park hotels", "w5.b": "· most recently deputy night manager",
+    "w.cv": "Full CV on LinkedIn",
+    "w.cert": "<strong>Certificates:</strong> Distart training “Digital Marketing, Management and AI” (750 teaching units, 04–07/2026) with the certificates AI Prompt Engineer and Conversational AI. They formally confirm what I have been doing in practice since 2023.",
+    "s9.rail": "How I work",
+    "s9.h": "Ask me something and you get an answer that helps.",
+    "s9.sub": "And quickly. That is how my colleagues knew me on the night shift and later at the Customer Care Center.",
+    "a1.h": "I take ownership.", "a1.p": "Whether it is a complaint at the front desk or a technical problem: I take it on and solve it.",
+    "a2.h": "I explain things clearly.", "a2.p": "Colleagues without a technical background can follow too.",
+    "a3.h": "I work calmly and reliably in a team.", "a3.p": "With an open ear and clear agreements.",
+    "a4.h": "I work with focus and meet deadlines.", "a4.p": "Preferably on one project, at my own pace and on time.",
+    "s12.rail": "Quick questions", "s12.h": "Quick questions.",
+    "q1": "What are you looking for?",
+    "q1.a": "A permanent role in Conversational AI. I work remotely from Hüfingen in the Black Forest and I am available now.",
+    "q2": "Can I try your work?",
+    "q2.a": "Yes. Ferdinand and Adrian are online. You can write to both or call them right on the website: <a href=\"https://fabianschenk94.github.io/Hotel-Tannenhof-DEMO/\">Try Ferdinand</a> · <a href=\"https://fabianschenk94.github.io/StaffGrid-Support-DEMO/\">Try Adrian</a>",
+    "q3": "Is there proof of your work?",
+    "q3.a": "Yes. An employment reference and a letter of recommendation from Mailytica, each in German and English, signed by the managing director. Plus the certificates AI Prompt Engineer and Conversational AI.",
+    "q4": "How do you introduce a team to AI?",
+    "q4.a": "A short briefing, for example about ten minutes at shift handover. After that I explain it one-to-one on screen until it sticks, and I stay available.",
+    "q5": "Are you tied to one industry?",
+    "q5.a": "No. Hotels and reservations, manufacturing or classic customer service: what matters is that customers call or write and should get a good answer faster.",
+    "s10.rail": "Where I want to go",
+    "s10.h": "Voice agents people enjoy talking to.",
+    "s10.p": "Many hotlines still work with computer voices and menus. I want to replace them with agents that sound human and understand what you need. You simply say what you want.",
+    "s11.rail": "Contact",
+    "s11.h": "Get in touch.",
+    "s11.sub": "I am open to a permanent role in Conversational AI, I work remotely and I am available now. The quickest way to reach me is a message on LinkedIn.",
+    "k.home": "Based in", "k.home.v": "Hüfingen, Baden-Württemberg, Germany",
+    "e.l": "Hüfingen, Black Forest",
+    "fo.claim": "The hotel pro who builds AI.", "fo.top": "Back to top", "fo.c1": "Page",
+    "x.roles": "Prompt Engineering · Conversational AI",
+    "x.h1": 'AI agents<br>that run in<br><span class="clay">production</span>.',
+    "x.lead1": "I am Fabian Schenk. I put AI agents for email, chat and phone into production. And I show teams how to work with them.",
+    "x.lead2": "I know customer service from more than eight years of hands-on work.",
+    "x.cta1": "See my projects",
+    "x.n2": "15%", "x.n3": "25%",
+    "x.f1": "AI agents brought into production",
+    "x.f2": "of all customer emails answered fully automatically",
+    "x.f3": "shorter waiting time on the phone",
+    "x.f4": "employees trained to work with AI",
+    "x.s2.rail": "Experience", "x.nav2": "Experience", "x.nav4": "Skills", "x.nav6": "Career",
+    "x.p1.meta": "System Specialist · 10/2023–09/2025 · AI rollout, platform administration &amp; Conversational AI",
+    "x.e1": "<strong>15% of all customer emails fully automated</strong><span>Introduced Mailytica in hotel reservations and guest service. The AI recognises what an email is about (intent classification). I trained it with examples and kept improving it.</span>",
+    "x.e2": "<strong>Four AI agents taken live</strong><span>Selected suitable recurring requests, developed the prompts in a structured way and measured quality continuously. After launch I supported the agents closely (hypercare).</span>",
+    "x.e3": "<strong>25% shorter waiting time on the phone</strong><span>Redesigned call distribution and queues in Genesys Cloud (IVR and ACD routing). Created announcements with Azure Text-to-Speech.</span>",
+    "x.e4": "<strong>Voicebot in Genesys Cloud</strong><span>Designed and built it. It recognises spoken invoice and reservation numbers and is still live today. Recognition of department and request was tested.</span>",
+    "x.e5": "<strong>Platform managed and integrated</strong><span>Managed Genesys Cloud (staff, roles, permissions). Connected the hotel system and Mailytica securely (OAuth), together with service providers such as Mailytica and Telekom.</span>",
+    "x.e6": "<strong>About 20 employees trained</strong><span>A workshop on Mailytica and the new ChatGPT features, backed up during shifts by short briefings and one-to-one support via screen sharing.</span>",
+    "x.e7": "<strong>Platforms evaluated</strong><span>Assessed Parloa and Cognigy for the contact centre, with first tests in a demo environment and a recommendation to senior management.</span>",
+    "x.p2.meta": "Prompt Engineer | AI Assistant Developer (LLM) · 10/2025–03/2026 · permanent, remote",
+    "x.p2.p1": "For a leading European fleet services provider I brought two multilingual AI agents into production: one for automated invoice processing and one for managing claims in correspondence with public authorities.",
+    "x.m1": "<strong>Prompt engineering in Azure OpenAI</strong><span>Developed, tested and improved prompts step by step, directly in the Azure OpenAI portal.</span>",
+    "x.m2": "<strong>Reliable, consistent answers</strong><span>Systematically checked and secured, with examples in the prompt (few-shot) and fixed rules for the output (output constraints).</span>",
+    "x.m3": "<strong>Documents as clean data</strong><span>Read the document (OCR), understand it with GPT, return it in a structured form. Step by step the output moved closer to the customer’s gold standard.</span>",
+    "x.m4": "<strong>Confirmed in writing</strong><span>Employment reference and letter of recommendation, each in German and English, signed by Lorenz Bernauer. He is also available for a reference call. I am happy to put you in touch.</span>",
+    "x.s3.rail": "Demos",
+    "x.s3.h": "My own agents, ready to try.",
+    "x.d1.role": "AI concierge · fictional Hotel Tannenhof · 10/2026",
+    "x.d1.p": "Voice and chat agent for a demo hotel: it answers guest questions in five languages and books rooms and tables live into a Google Sheets hotel system. It answers only the question that was asked.",
+    "x.d1.hl": "<li>Conversation design: persona, standard case, follow-up questions and handover to a human</li><li>Four interfaces (webhooks) and a backend in Google Apps Script, with input validation, booking limits and duplicate detection</li><li>Guardrails, data minimisation and nine fixed test cases, up to defence against manipulation attempts (prompt injection)</li>",
+    "x.d2.role": "AI support agent · fictional software company StaffGrid · 10/2026",
+    "x.d2.p": "Multilingual voice and chat agent (EN/DE/FR) for first-level support: it opens cases, prioritises them on four levels and creates them directly in Jira Service Management. It gives the status by case number.",
+    "x.d2.hl": "<li>Its own interface to the ticket system (REST, Cloudflare Worker), with key checks, rate limits and clear error codes</li><li>Persona and conversation flows documented, including handover to a human</li><li>Seven sources of error fixed by systematically reviewing the transcripts of test calls</li>",
+    "x.o1.m": "Own project · since 09/2026", "x.o1.h": "Agentic content pipeline",
+    "x.o1.p": "Put a pipeline based on an open-source repository into operation and extended it with Claude Code. Connected five API services and verified it before use with 107 passing automated tests (unit tests). Every publication goes through a manual approval (human-in-the-loop).",
+    "x.o3.m": "Private · ongoing", "x.o3.h": "My own custom GPTs",
+    "x.o3.p": "More than 10 custom GPTs with knowledge bases (RAG) for concrete everyday tasks, including an email assistant, a checker for texts and cover letters and an AI news assistant.",
+    "x.s4.h": "I know customer service from the inside.",
+    "x.s4.sub": "For more than eight years I worked at the front desk and on the phone myself, led shifts and trained new team members. That is why I build agents from the guest’s point of view. Three rules I work by follow from that.",
+    "x.s6.rail": "Skills",
+    "x.s6.h": "From the prompt to go-live.",
+    "x.s6.sub": "I take an AI agent from the first idea into daily operations and make sure the team can work with it.",
+    "x.k1": "LLMs &amp; agents",
+    "x.k1.c": "<li>ChatGPT &amp; custom GPTs</li><li>OpenAI API</li><li>Azure OpenAI</li><li>Claude</li><li>Perplexity</li><li>RAG / knowledge base</li><li>Tool calling</li>",
+    "x.k4": "Development &amp; interfaces",
+    "x.k4.c": "<li>Claude Code</li><li>VS Code</li><li>Python (AI-assisted)</li><li>Google Apps Script</li><li>Google Sheets</li><li>Cloudflare Workers</li><li>GitHub &amp; GitHub Pages</li><li>Webhooks</li><li>REST APIs</li><li>OAuth</li><li>Jira Service Management</li><li>Apify</li><li>Publora</li>",
+    "x.k5": "Training &amp; enablement",
+    "x.k5.c": "<li>Onboarding &amp; training</li><li>Workshops</li><li>One-to-one coaching via screen sharing</li><li>Team enablement</li><li>Standardised processes</li><li>LinkedIn articles</li><li>Project documentation</li>",
+    "x.k6": "Quality &amp; compliance",
+    "x.k6.c": "<li>Testing</li><li>Validation</li><li>Unit tests</li><li>Agent testing</li><li>Guardrails</li><li>KPI monitoring</li><li>Go-live &amp; hypercare</li><li>EU AI Act</li><li>GDPR</li><li>Human-in-the-loop</li>",
+    "x.langs": "<span><strong>German</strong> · native</span><span><strong>English</strong> · business fluent</span>",
+    "x.s8.rail": "Career",
+    "x.s8.h": "Customer service first, AI in production since 2023.",
+    "x.s8.p1": "I trained as a hotel specialist. For more than eight years I worked the night shift at the Europa-Park Hotel Resort, led shifts and trained new team members. I know from experience what guests need on the phone and at the front desk.",
+    "x.s8.p2": "I started using ChatGPT privately very early on. In 2023 it became my job: as System Specialist at the Customer Care Center of the Europa-Park Hotel Resort I brought AI into live operations. Since then I have worked on AI projects only.",
+    "x.t.ph1": "Hospitality · leadership, onboarding &amp; training",
+    "x.t1.a": "Vocational training as hotel specialist (Hotelfachmann)",
+    "x.t2.a": "Head of service",
+    "x.t3.a": "Night audit, shift leader on the night shift, deputy night audit manager",
+    "x.t3.c": "<li>Shift leadership</li><li>Front desk and phone</li><li>Training new team members</li><li>Onboarding and training routines</li>",
+    "x.t.mark": "AI from here on · 2023",
+    "x.t5.a": "System Specialist, Customer Care Center",
+    "x.t5.b": "Europa-Park Hotel Resort, Rust · AI rollout, platform administration &amp; Conversational AI",
+    "x.t5.hl": "<li>15% of all customer emails fully automated</li><li>4 AI agents taken to go-live</li><li>25% shorter waiting time on the phone</li><li>Voicebot built in Genesys Cloud</li><li>About 20 employees trained</li><li>Parloa and Cognigy assessed and evaluated</li>",
+    "x.t6.b": "Mailytica GmbH, Konstanz · permanent, remote",
+    "x.t6.hl": "<li>Two multilingual AI agents brought into production</li><li>Prompt engineering, testing and tuning in Azure OpenAI</li><li>Quality assurance with few-shot and output constraints</li><li>Invoice and receipt processing with OCR and GPT</li>",
+    "x.t6.c": "<li>Azure OpenAI</li><li>Prompt tuning</li><li>OCR</li><li>Structured output (JSON)</li>",
+    "x.t7.t": "04/2026–today",
+    "x.t7.a": "Family time and AI training",
+    "x.t7.b": "Certifying the practice I have applied since 2023, plus my own projects",
+    "x.t7.hl": "<li>Certified AI Prompt Engineer, Distart (06/2026)</li><li>Conversational AI training, Distart (07/2026)</li><li>Two voice and chat agents built with ElevenLabs (10/2026)</li><li>Agentic content pipeline (since 09/2026)</li>",
+    "x.cert": "<strong>Certificates:</strong> Distart training “Digital Marketing, Management and AI” (750 teaching units, 04–07/2026) with the certificates AI Prompt Engineer and Conversational AI. They formally confirm what I have been doing in practice since 2023.",
+    "x.q3.a": "Yes. An employment reference and a letter of recommendation from Mailytica, each in German and English. Lorenz Bernauer, CEO of Mailytica, is also available for a reference call. I am happy to put you in touch. Plus the certificates AI Prompt Engineer and Conversational AI.",
+    "x.fo.claim": "Prompt Engineer for Conversational AI.",
+    "y.w.rail": "Overview", "y.w.h": "Seven projects at a glance.", "y.w.go": "Go to project",
+    "y.w1.t": "Customer Care Center", "y.w1.m": "Europa-Park Hotel Resort · AI rollout · 2023–2025",
+    "y.w2.t": "Two AI agents for invoices and receipts", "y.w2.m": "Mailytica GmbH · Azure OpenAI · 2025–2026",
+    "y.w3.m": "AI concierge · voice and chat · demo", "y.w4.m": "AI support agent · voice and chat · demo",
+    "y.w5.m": "Own project · Claude Code and Python", "y.w6.m": "Langdock · OCR and structured data", "y.w7.m": "Private · more than 10 GPTs with a knowledge base",
+    "y.o.l": "Where I work", "y.o.h": "Remote from Hüfingen in the Black Forest.",
+    "z.el": "I know both sides:<br>the person who calls,<br>and the technology that answers.",
+    "z.er": "Prompt Engineer · Conversational AI<br>Hüfingen, Black Forest · remote",
+    "z.c2": "Projects", "z.c3": "Profiles", "z.s1": "Open to permanent role", "z.s2": "Remote · available now",
+    "z.colo": "The wordmark is drawn in blocks, not set in type. Hotel Tannenhof and StaffGrid are fictional demo projects.",
+    "u.t5": "Brought AI into live operations: email automation, four AI agents, telephony routing and a voicebot.",
+    "u.t6": "Brought two multilingual AI agents for invoices and receipts into production.",
+    "u.t7": "Two certificates from Distart, plus two voice and chat agents of my own and a content pipeline.",
+    "u.n4": "about",
+    "u.src": "Achieved at the Customer Care Center of the Europa-Park Hotel Resort (2023–2025) and at Mailytica (2025–2026).",
+    "u.d0": "Start",
+    "u.d1": "Services",
+    "u.d2": "Experience",
+    "u.d3": "Demos",
+    "u.d4": "Skills",
+    "u.d5": "Career",
+    "u.d6": "Contact",
+    "u.aw": "How I work in a team",
+    "u.core": "Core skills",
+    "u.lf": "Try Ferdinand live",
+    "u.gf": "Ferdinand on GitHub",
+    "u.la": "Try Adrian live",
+    "u.ga": "Adrian on GitHub",
+    "foot": "Hotel Tannenhof and StaffGrid are fictional demo projects with no real bookings or customers."
+  };
+  var WORDS = { de: ["per E-Mail.", "im Chat.", "am Telefon."], en: ["by email.", "in chat.", "on the phone."] };
+
+  var nodes = $$("[data-i18n]");
+  var de = {};
+  nodes.forEach(function (n) { if (!(n.dataset.i18n in de)) de[n.dataset.i18n] = n.innerHTML; });
+  var btnDe = $("#lang-de"), btnEn = $("#lang-en"), portrait = $("#portrait");
+  function setLang(l) {
+    lang = l;
+    var dict = l === "en" ? en : de;
+    nodes.forEach(function (n) { var k = n.dataset.i18n; n.innerHTML = dict[k] !== undefined ? dict[k] : de[k]; });
+    root.lang = l;
+    btnDe.setAttribute("aria-pressed", String(l === "de"));
+    btnEn.setAttribute("aria-pressed", String(l === "en"));
+    portrait.alt = l === "en" ? "Portrait of Fabian Schenk" : "Porträt von Fabian Schenk";
+    try { localStorage.setItem("fs-lang", l); } catch (e) {}
+    hooks.forEach(function (h) { safe(function () { h(l); }); });
+  }
+  btnDe.addEventListener("click", function () { setLang("de"); });
+  btnEn.addEventListener("click", function () { setLang("en"); });
+
+  /* ---------- Einblenden beim Scrollen ---------- */
+  safe(function () {
+    if (RM || !("IntersectionObserver" in window)) return;
+    root.classList.add("js");
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.01 });
+    $$(".section .rail, .section .body > *, .facts li").forEach(function (el) {
+      var i = Array.prototype.indexOf.call(el.parentNode.children, el);
+      el.classList.add("bf");
+      el.style.setProperty("--d", (i % 4) * 0.07 + "s");
+      io.observe(el);
+    });
+  });
+
+  /* ---------- Dock mit Vergrößerung ---------- */
+  safe(function () {
+    var dock = $(".dock"), items = $$("a", dock);
+    dock.addEventListener("pointermove", function (e) {
+      if (e.pointerType === "touch") return;
+      dock.classList.remove("rest");
+      items.forEach(function (a) {
+        var r = a.getBoundingClientRect();
+        var d = Math.abs(e.clientX - (r.left + r.width / 2));
+        a.style.setProperty("--s", (1 + 0.42 * Math.max(0, 1 - d / 110)).toFixed(3));
+      });
+    });
+    dock.addEventListener("pointerleave", function () {
+      dock.classList.add("rest");
+      items.forEach(function (a) { a.style.setProperty("--s", 1); });
+    });
+    if (!("IntersectionObserver" in window)) { dock.classList.add("show"); return; }
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { dock.classList.toggle("show", !(e.isIntersecting && e.intersectionRatio >= 0.5)); });
+    }, { threshold: [0, 0.5, 1] }).observe($(".hero"));
+    var map = {};
+    items.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        items.forEach(function (a) { a.classList.remove("active"); });
+        var a = map[e.target.id]; if (a) a.classList.add("active");
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    Object.keys(map).forEach(function (id) { var s = document.getElementById(id); if (s) io.observe(s); });
+  });
+
+  /* ---------- Kreis-Menü ---------- */
+  safe(function () {
+    var fab = $("#fab"), ring = $("#ring"), links = $$("a", ring);
+    function place() {
+      var r = Math.min(132, window.innerWidth * 0.34), n = links.length;
+      links.forEach(function (a, i) {
+        var ang = -Math.PI / 2 + (i / n) * Math.PI * 2;
+        a.style.setProperty("--x", (Math.cos(ang) * r).toFixed(1) + "px");
+        a.style.setProperty("--y", (Math.sin(ang) * r).toFixed(1) + "px");
+      });
+    }
+    function toggle(open) {
+      if (open) place();
+      ring.classList.toggle("open", open);
+      fab.setAttribute("aria-expanded", String(open));
+    }
+    fab.addEventListener("click", function () { toggle(!ring.classList.contains("open")); });
+    ring.addEventListener("click", function () { toggle(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") toggle(false); });
+  });
+
+  /* ---------- Punktraster im Startbereich ---------- */
+  safe(function () {
+    var hero = $(".hero"), c = $("#grid"), ctx = c.getContext("2d");
+    var W = 0, H = 0, S = 30, p = { x: -999, y: -999, k: 0, tk: 0 }, rip = [], raf = 0;
+    function draw(now) {
+      raf = 0;
+      ctx.clearRect(0, 0, W, H);
+      p.k += (p.tk - p.k) * 0.12;
+      rip = rip.filter(function (r) { return now - r.t < 1800; });
+      for (var y = S / 2; y < H; y += S) {
+        for (var x = S / 2; x < W; x += S) {
+          var ox = 0, oy = 0, e = 0, dx = p.x - x, dy = p.y - y, d = Math.sqrt(dx * dx + dy * dy);
+          if (p.k > 0.01 && d < 190 && d > 0.1) { var f = 1 - d / 190; f = f * f * 20 * p.k; ox += dx / d * f; oy += dy / d * f; e += f / 20; }
+          for (var i = 0; i < rip.length; i++) {
+            var r = rip[i], age = (now - r.t) / 1000, ddx = x - r.x, ddy = y - r.y, dd = Math.sqrt(ddx * ddx + ddy * ddy), band = Math.abs(dd - age * 460);
+            if (band < 70 && dd > 0.1) { var a = (1 - band / 70) * (1 - age / 1.8) * 16; ox += ddx / dd * a; oy += ddy / dd * a; e += a / 16; }
+          }
+          var s = 1.3 + e * 1.6;
+          ctx.fillStyle = e > 0.02 ? "rgba(219,140,100," + (0.25 + Math.min(0.6, e * 0.7)).toFixed(2) + ")" : "rgba(168,158,144,0.22)";
+          ctx.fillRect(x + ox - s / 2, y + oy - s / 2, s, s);
+        }
+      }
+      if (p.tk > 0 || p.k > 0.02 || rip.length) raf = requestAnimationFrame(draw);
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(draw); }
+    function size() {
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = hero.clientWidth; H = hero.clientHeight;
+      c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(performance.now());
+    }
+    if (!RM) {
+      hero.addEventListener("pointermove", function (e) { var r = hero.getBoundingClientRect(); p.x = e.clientX - r.left; p.y = e.clientY - r.top; p.tk = 1; kick(); });
+      hero.addEventListener("pointerleave", function () { p.tk = 0; kick(); });
+      hero.addEventListener("pointerdown", function (e) { var r = hero.getBoundingClientRect(); rip.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() }); kick(); });
+    }
+    if ("ResizeObserver" in window) new ResizeObserver(size).observe(hero); else window.addEventListener("resize", size);
+    size();
+  });
+
+  /* ---------- Vorgehen: Liste mit Vorschau ---------- */
+  safe(function () {
+    var rootEl = $("#lumina"), items = $$("li", rootEl), pv = $(".lum-preview", rootEl);
+    var pn = $(".lum-num", pv), ph = $("h3", pv), pp = $("p", pv), pimg = $(".lum-img", pv), cur = 0;
+    function show(i, anim) {
+      cur = i;
+      items.forEach(function (li, j) { li.classList.toggle("active", j === i); });
+      pn.textContent = "0" + (i + 1);
+      ph.innerHTML = $(".t", items[i]).innerHTML;
+      pp.innerHTML = $(".lum-text", items[i]).innerHTML;
+      pimg.src = "img/schritt-" + (i + 1) + ".webp";
+      if (anim) { pv.classList.remove("swap"); void pv.offsetWidth; pv.classList.add("swap"); }
+    }
+    items.forEach(function (li, i) {
+      var b = $("button", li);
+      b.addEventListener("mouseenter", function () { if (i !== cur) show(i, true); });
+      b.addEventListener("focus", function () { if (i !== cur) show(i, true); });
+      b.addEventListener("click", function () { show(i, i !== cur); });
+    });
+    hooks.push(function () { show(cur, false); });
+  });
+
+  /* ---------- Zeitleiste, die sich beim Scrollen zeichnet ---------- */
+  safe(function () {
+    var tl = $("#timeline"), lis = $$(".tl, .tl-mark", tl);
+    if (RM) { tl.style.setProperty("--p", 1); lis.forEach(function (l) { l.classList.add("reached"); }); return; }
+    function upd() {
+      var r = tl.getBoundingClientRect();
+      var p = Math.max(0, Math.min(1, (window.innerHeight * 0.66 - r.top) / r.height));
+      tl.style.setProperty("--p", p.toFixed(4));
+      lis.forEach(function (li) { li.classList.toggle("reached", p >= (li.offsetTop + 22) / r.height); });
+    }
+    onScroll(upd); upd();
+  });
+
+  /* ---------- Kurz gefragt ---------- */
+  safe(function () {
+    var items = $$(".faq-item");
+    items.forEach(function (it) {
+      var b = $("button", it);
+      b.addEventListener("click", function () {
+        var open = it.classList.contains("open");
+        items.forEach(function (o) { o.classList.remove("open"); $("button", o).setAttribute("aria-expanded", "false"); });
+        if (!open) { it.classList.add("open"); b.setAttribute("aria-expanded", "true"); }
+      });
+    });
+  });
+
+  /* ---------- Fußbereich: Pixelkante zwischen Gemälde und Farbfläche ---------- */
+  safe(function () {
+    var c = $("#scene"), ctx = c.getContext("2d");
+    var B = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+    function hash(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+    function noise(x, period) { var t = x / period, i = Math.floor(t), f = t - i; f = f * f * (3 - 2 * f); return hash(i + period * 13) * (1 - f) + hash(i + 1 + period * 13) * f; }
+    function draw() {
+      var Wc = c.clientWidth, Hc = c.clientHeight;
+      if (!Wc || !Hc) return;
+      var px = Wc < 700 ? 4 : 6, w = Math.ceil(Wc / px), h = Math.ceil(Hc / px);
+      c.width = w; c.height = h;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#b54c27";
+      var band = Math.max(5, Math.round(h * 0.1));
+      for (var x = 0; x < w; x++) {
+        var xc = x - (x % 2);
+        var e = h * (0.52 + 0.16 * (noise(xc, 34) - 0.5) + 0.1 * (noise(xc, 11) - 0.5) + 0.05 * (hash(xc * 7.3) - 0.5));
+        for (var y = Math.max(0, Math.floor(e - 2)); y < h; y++) {
+          var d = (y - e) / band;
+          if (d >= 1 || d > (B[(y & 3) * 4 + (x & 3)] + 0.5) / 16) ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }
+    var to = 0;
+    window.addEventListener("resize", function () { clearTimeout(to); to = setTimeout(draw, 150); });
+    draw();
+  });
+
+  /* ---------- Fußbereich: Schriftzug aus Blöcken, Schwung, Fadenkreuz ---------- */
+  safe(function () {
+    var foot = $("#fuss"), c = $("#wordmark"), ctx = c.getContext("2d"), TXT = "FABIAN SCHENK";
+    var cells = [], cols = 0, rows = 0, t0 = null, hover = null, raf = 0, seen = false;
+    var instant = RM || !("IntersectionObserver" in window);
+    function build() {
+      var Wc = c.parentNode.clientWidth;
+      if (!(Wc > 0)) return;
+      rows = Wc < 700 ? 13 : 16;
+      var f = "800 " + (rows * 1.16).toFixed(1) + 'px "Bricolage Grotesque", sans-serif';
+      var o = document.createElement("canvas"), x = o.getContext("2d");
+      x.font = f; cols = Math.ceil(x.measureText(TXT).width) + 2;
+      o.width = cols; o.height = rows; x = o.getContext("2d");
+      x.font = f; x.textBaseline = "alphabetic"; x.fillStyle = "#000"; x.fillText(TXT, 1, rows * 0.9);
+      var d = x.getImageData(0, 0, cols, rows).data;
+      cells = [];
+      for (var yy = 0; yy < rows; yy++) for (var xx = 0; xx < cols; xx++) if (d[(yy * cols + xx) * 4 + 3] > 105) cells.push({ x: xx, y: yy, d: (xx / cols) * 900 + Math.random() * 450, r: Math.random() });
+      c.width = cols; c.height = rows + 4;
+      c.style.height = (Wc / cols * (rows + 4)).toFixed(1) + "px";
+      draw(performance.now());
+    }
+    function draw(now) {
+      raf = 0;
+      var el = instant ? 1e9 : (t0 === null ? -1 : now - t0), more = false, slice = Math.floor(now / 90);
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.fillStyle = "#f4eee5";
+      for (var i = 0; i < cells.length; i++) {
+        var q = cells[i];
+        if (el < q.d) { more = true; continue; }
+        var px = q.x, py = q.y + 2;
+        if (hover) {
+          var dx = q.x - hover.x, dy = q.y + 2 - hover.y, dd = dx * dx + dy * dy;
+          if (dd < 64) {
+            var k = 1 - dd / 64, s = Math.sin((i + 1) * 12.9898 + slice * 78.233) * 43758.5453; s = s - Math.floor(s);
+            if (s < k * 0.45) continue;
+            px += Math.round((s - 0.5) * 6 * k); py += Math.round((q.r - 0.5) * 6 * k);
+          }
+        }
+        ctx.fillRect(px, py, 1, 1);
+      }
+      if ((more && t0 !== null) || hover) raf = requestAnimationFrame(draw);
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(draw); }
+    inView(c, function (v) { if (v && !seen) { seen = true; t0 = performance.now(); kick(); var fl = $("#flourish"); if (fl) fl.classList.add("on"); } });
+    if (instant) { var fl0 = $("#flourish"); if (fl0) fl0.classList.add("on"); }
+    if (document.fonts && document.fonts.load) document.fonts.load('800 28px "Bricolage Grotesque"').then(build, build); else build();
+    var to = 0;
+    window.addEventListener("resize", function () { clearTimeout(to); to = setTimeout(build, 150); });
+
+    var cur = $("#whcur"), ch = $(".h", cur), cvv = $(".v", cur), ring = $(".ring", cur), lab = $(".lab", cur);
+    function pad(n) { n = String(Math.max(0, Math.round(n))); while (n.length < 4) n = "0" + n; return n; }
+    foot.addEventListener("pointermove", function (e) {
+      if (e.pointerType === "touch") return;
+      var r = foot.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      cur.classList.add("on");
+      ch.style.transform = "translateY(" + y.toFixed(1) + "px)";
+      cvv.style.transform = "translateX(" + x.toFixed(1) + "px)";
+      ring.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
+      lab.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
+      lab.textContent = String.fromCharCode(65 + Math.min(15, Math.floor(x / r.width * 16))) + (1 + Math.min(8, Math.floor(y / r.height * 9))) + " · " + pad(x) + "," + pad(y);
+      var wr = c.getBoundingClientRect();
+      if (e.clientX > wr.left - 40 && e.clientX < wr.right + 40 && e.clientY > wr.top - 40 && e.clientY < wr.bottom + 40) {
+        hover = { x: (e.clientX - wr.left) / wr.width * c.width, y: (e.clientY - wr.top) / wr.height * c.height }; kick();
+      } else if (hover) { hover = null; kick(); }
+    });
+    foot.addEventListener("pointerleave", function () { cur.classList.remove("on"); hover = null; kick(); });
+  });
+
+  /* ---------- Parallaxe: Porträt in zwei Ebenen, Band und Fußbild ---------- */
+  safe(function () {
+    if (RM) return;
+    var hero = $(".hero"), plate = $(".p-plate"), cut = $(".p-cut"), mx = 0, my = 0, tx = 0, ty = 0, raf = 0;
+    var band = $("#ort"), bimg = $("#pband-img"), btext = $("#pband-text"), fart = $(".wh-top"), fimg = $("#foot-img");
+    function apply() {
+      raf = 0;
+      mx += (tx - mx) * 0.1; my += (ty - my) * 0.1;
+      var wide = window.innerWidth > 720, y = Math.min(600, window.pageYOffset || 0);
+      var sc = wide ? y : 0;
+      plate.style.transform = "translate(" + (-mx * 7).toFixed(1) + "px," + (sc * 0.03 - my * 5).toFixed(1) + "px)";
+      cut.style.transform = "translate(" + (mx * 11).toFixed(1) + "px," + (sc * 0.085 + my * 7).toFixed(1) + "px)";
+      if (Math.abs(tx - mx) > 0.002 || Math.abs(ty - my) > 0.002) raf = requestAnimationFrame(apply);
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(apply); }
+    hero.addEventListener("pointermove", function (e) {
+      if (e.pointerType === "touch") return;
+      var r = hero.getBoundingClientRect();
+      tx = (e.clientX - r.left) / r.width - 0.5; ty = (e.clientY - r.top) / r.height - 0.5; kick();
+    });
+    hero.addEventListener("pointerleave", function () { tx = 0; ty = 0; kick(); });
+    function layer(box, img, amt, text) {
+      var r = box.getBoundingClientRect(), vh = window.innerHeight;
+      if (r.bottom < -50 || r.top > vh + 50) return;
+      var prog = (vh - r.top) / (vh + r.height) - 0.5;
+      img.style.transform = "translateY(" + (-prog * r.height * amt).toFixed(1) + "px)";
+      if (text) text.style.transform = "translateY(" + (prog * 60).toFixed(1) + "px)";
+    }
+    onScroll(function () { kick(); layer(band, bimg, 0.26, btext); layer(fart, fimg, 0.06, null); });
+    layer(band, bimg, 0.26, btext); layer(fart, fimg, 0.06, null);
+  });
+
+  /* ---------- Warp-Karussell (WebGL) ---------- */
+  safe(function () {
+    var el = $("#wheel"), cv = $("#warp"), items = $$(".wheel-item", el), n = items.length;
+    var count = $(".wheel-count", el), title = $(".wheel-title", el), meta = $(".wheel-meta", el), link = $(".wheel-link", el);
+    var AVG = [[0.349, 0.322, 0.282], [0.263, 0.227, 0.204], [0.243, 0.22, 0.231], [0.227, 0.176, 0.169], [0.251, 0.184, 0.141], [0.208, 0.184, 0.161], [0.235, 0.188, 0.153]];
+    var S = 1.45, H0 = 0.76, front = -1;
+    function mod(i) { return ((i % n) + n) % n; }
+    function info(i) {
+      front = i;
+      count.textContent = "0" + (i + 1) + " / 0" + n;
+      title.innerHTML = $(".cap b", items[i]).innerHTML;
+      meta.innerHTML = $(".cap i", items[i]).innerHTML;
+      link.setAttribute("href", items[i].getAttribute("href"));
+    }
+    hooks.push(function () { info(front < 0 ? 0 : front); });
+    info(0);
+    function fail() { el.classList.add("no-gl"); }
+    var gl = null;
+    try { gl = cv.getContext("webgl", { premultipliedAlpha: true, antialias: false }) || cv.getContext("experimental-webgl"); } catch (e) {}
+    if (!gl) { fail(); return; }
+    var VS = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
+    var FS = [
+      "precision highp float;",
+      "uniform vec2 uRes;uniform float uRot;uniform float uN;uniform sampler2D uTex;uniform vec3 uGlow;",
+      "const float S=1.45;const float A=0.8;const float B=0.9;const float H0=0.76;",
+      "float warp(float s){float a=abs(s);float u=a<A?a:A+B*(1.-exp(-(a-A)/B));return sign(s)*u;}",
+      "vec4 card(float s,float y,float smax){",
+      " float q=warp(s)+uRot*S;float idx=floor(q/S+.5);float local=q-idx*S;float a=abs(s);",
+      " float t=clamp((a-1.)/max(.001,smax-1.),0.,1.);",
+      " float f=1.-.30*smoothstep(.45,1.,a)+1.6*pow(t,2.6);",
+      " vec2 uv=vec2(local+.5,.5-y/(2.*H0*f));",
+      " vec2 d=abs(uv-.5)*vec2(2.,3.)-vec2(1.,1.5)+.07;",
+      " float sd=length(max(d,0.))+min(max(d.x,d.y),0.)-.07;",
+      " float m=1.-smoothstep(-.012,.012,sd);",
+      " float ci=mod(idx,uN);",
+      " vec2 tuv=vec2((ci+clamp(uv.x,.006,.994))/uN,clamp(uv.y,.004,.996));",
+      " return vec4(texture2D(uTex,tuv).rgb,m);}",
+      "void main(){",
+      " vec2 p=gl_FragCoord.xy/uRes*2.-1.;float aspect=uRes.x/uRes.y;",
+      " float cwx=1.3333*H0/aspect;float s=p.x/cwx;float smax=1./cwx;",
+      " float ca=.022*smoothstep(.7,max(.8,smax),abs(s));",
+      " vec4 c0=card(s,p.y,smax);vec4 cr=card(s*(1.+ca),p.y*(1.-ca*.8),smax);vec4 cb=card(s*(1.-ca),p.y*(1.+ca*.8),smax);",
+      " vec3 col=vec3(cr.r*cr.a,c0.g*c0.a,cb.b*cb.a);float al=max(c0.a,max(cr.a,cb.a));",
+      " float side=smoothstep(.6,1.3,abs(s));col*=mix(1.,.78,side);",
+      " float streak=smoothstep(1.,max(1.01,smax),abs(s));col+=vec3(.86,.55,.39)*streak*streak*.22*c0.a;",
+      " float gx=exp(-pow(p.x/.46,2.));float gy=exp(-pow((abs(p.y)-1.02)/.17,2.));",
+      " vec3 glow=uGlow*gx*gy*.75;float ga=max(glow.r,max(glow.g,glow.b));",
+      " gl_FragColor=vec4(col+glow*(1.-al),al+ga*(1.-al));}"
+    ].join("\n");
+    function sh(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
+    var prog, uRes, uRot, uN, uGlow;
+    try {
+      prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error("link");
+      gl.useProgram(prog);
+      var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      var loc = gl.getAttribLocation(prog, "a"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      uRes = gl.getUniformLocation(prog, "uRes"); uRot = gl.getUniformLocation(prog, "uRot"); uN = gl.getUniformLocation(prog, "uN"); uGlow = gl.getUniformLocation(prog, "uGlow");
+      gl.uniform1f(uN, n);
+    } catch (e) { fail(); return; }
+
+    var rot = RM ? 0 : -1, target = 0, drag = false, moved = 0, sx = 0, srot = 0, raf = 0, ready = false, W = 0, H = 0;
+    function cardPx() { return 0.6667 * H0 * cv.clientHeight; }
+    function draw() {
+      var dpr = Math.min(1.75, window.devicePixelRatio || 1), w = Math.round(cv.clientWidth * dpr), h = Math.round(cv.clientHeight * dpr);
+      if (w !== W || h !== H) { W = w; H = h; cv.width = w; cv.height = h; gl.viewport(0, 0, w, h); }
+      var i0 = Math.floor(rot), fr = rot - i0, a = AVG[mod(i0)], b = AVG[mod(i0 + 1)], g = [0, 0, 0];
+      for (var k = 0; k < 3; k++) g[k] = (a[k] * (1 - fr) + b[k] * fr) * 1.5 * 0.55 + [0.86, 0.55, 0.39][k] * 0.45;
+      gl.uniform2f(uRes, w, h); gl.uniform1f(uRot, rot); gl.uniform3f(uGlow, g[0], g[1], g[2]);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      var i = mod(Math.round(rot)); if (i !== front) info(i);
+    }
+    function tick() {
+      raf = 0;
+      if (!ready) return;
+      if (!drag) { rot += (target - rot) * 0.11; if (Math.abs(target - rot) < 0.002) rot = target; }
+      draw();
+      if (drag || rot !== target) raf = requestAnimationFrame(tick);
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(tick); }
+    function go(d) { target = Math.round(target) + d; kick(); }
+    function open() { var href = items[mod(Math.round(rot))].getAttribute("href"); var t = document.getElementById(href.slice(1)); if (t) t.scrollIntoView(); try { history.replaceState(null, "", href); } catch (e) {} }
+
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+        ready = true; draw();
+      } catch (e) { fail(); }
+    };
+    img.onerror = fail;
+    img.src = "img/wheel-atlas-2.webp";
+
+    cv.addEventListener("pointerdown", function (e) { drag = true; moved = 0; sx = e.clientX; srot = rot; try { cv.setPointerCapture(e.pointerId); } catch (x) {} });
+    cv.addEventListener("pointermove", function (e) {
+      if (!drag) return;
+      var dx = e.clientX - sx; moved = Math.max(moved, Math.abs(dx));
+      rot = srot - dx / (cardPx() * S); target = rot; kick();
+    });
+    function end(e) {
+      if (!drag) return; drag = false;
+      if (moved < 6 && e && e.type === "pointerup") {
+        var r = cv.getBoundingClientRect(), s = (e.clientX - r.left - r.width / 2) / cardPx();
+        target = Math.round(rot);
+        if (Math.abs(s) <= 0.5) open(); else go(s > 0 ? 1 : -1);
+      } else { target = Math.round(rot); }
+      kick();
+    }
+    cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
+    cv.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") { e.preventDefault(); go(-1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
+      else if (e.key === "Enter") { open(); }
+    });
+    $(".wheel-prev", el).addEventListener("click", function () { go(-1); });
+    $(".wheel-next", el).addEventListener("click", function () { go(1); });
+    cv.addEventListener("webglcontextlost", function (e) { e.preventDefault(); fail(); });
+    window.addEventListener("resize", function () { if (ready) draw(); });
+    inView(cv, function (v) { if (v && ready && rot !== target) kick(); else if (v) setTimeout(kick, 300); });
+  });
+
+  /* ---------- Bildbeschreibungen je Sprache ---------- */
+  safe(function () {
+    var imgs = $$("img[data-alt-en]");
+    imgs.forEach(function (im) { im.setAttribute("data-alt-de", im.alt); });
+    hooks.push(function (l) { imgs.forEach(function (im) { im.alt = im.getAttribute(l === "en" ? "data-alt-en" : "data-alt-de"); }); });
+  });
+
+  var saved = null;
+  try { saved = localStorage.getItem("fs-lang"); } catch (e) {}
+  if (saved === "en") setLang("en");
+})();
+</script>
+</body>
+</html>
